@@ -10,33 +10,157 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedPainelRouteImport } from './routes/_authenticated/painel'
+import { Route as AuthenticatedPassagensRouteImport } from './routes/_authenticated/passagens'
+import { Route as AuthenticatedTerceirosRouteImport } from './routes/_authenticated/terceiros'
+import { Route as AuthenticatedAtividadesIndexRouteImport } from './routes/_authenticated/atividades/index'
+import { Route as AuthenticatedAtividadesIdRouteImport } from './routes/_authenticated/atividades/$id'
+import { Route as AuthenticatedRondasIndexRouteImport } from './routes/_authenticated/rondas/index'
+import { Route as AuthenticatedRondasIdRouteImport } from './routes/_authenticated/rondas/$id'
+import { Route as AuthenticatedRondasNovaRouteImport } from './routes/_authenticated/rondas/nova'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedPainelRoute = AuthenticatedPainelRouteImport.update({
+  id: '/painel',
+  path: '/painel',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedPassagensRoute = AuthenticatedPassagensRouteImport.update({
+  id: '/passagens',
+  path: '/passagens',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedTerceirosRoute = AuthenticatedTerceirosRouteImport.update({
+  id: '/terceiros',
+  path: '/terceiros',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAtividadesIndexRoute =
+  AuthenticatedAtividadesIndexRouteImport.update({
+    id: '/atividades/',
+    path: '/atividades/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAtividadesIdRoute =
+  AuthenticatedAtividadesIdRouteImport.update({
+    id: '/atividades/$id',
+    path: '/atividades/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedRondasIndexRoute =
+  AuthenticatedRondasIndexRouteImport.update({
+    id: '/rondas/',
+    path: '/rondas/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedRondasIdRoute = AuthenticatedRondasIdRouteImport.update({
+  id: '/rondas/$id',
+  path: '/rondas/$id',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedRondasNovaRoute = AuthenticatedRondasNovaRouteImport.update({
+  id: '/rondas/nova',
+  path: '/rondas/nova',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/painel': typeof AuthenticatedPainelRoute
+  '/passagens': typeof AuthenticatedPassagensRoute
+  '/terceiros': typeof AuthenticatedTerceirosRoute
+  '/atividades/$id': typeof AuthenticatedAtividadesIdRoute
+  '/rondas/$id': typeof AuthenticatedRondasIdRoute
+  '/rondas/nova': typeof AuthenticatedRondasNovaRoute
+  '/atividades/': typeof AuthenticatedAtividadesIndexRoute
+  '/rondas/': typeof AuthenticatedRondasIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/painel': typeof AuthenticatedPainelRoute
+  '/passagens': typeof AuthenticatedPassagensRoute
+  '/terceiros': typeof AuthenticatedTerceirosRoute
+  '/atividades/$id': typeof AuthenticatedAtividadesIdRoute
+  '/rondas/$id': typeof AuthenticatedRondasIdRoute
+  '/rondas/nova': typeof AuthenticatedRondasNovaRoute
+  '/atividades': typeof AuthenticatedAtividadesIndexRoute
+  '/rondas': typeof AuthenticatedRondasIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/_authenticated/painel': typeof AuthenticatedPainelRoute
+  '/_authenticated/passagens': typeof AuthenticatedPassagensRoute
+  '/_authenticated/terceiros': typeof AuthenticatedTerceirosRoute
+  '/_authenticated/atividades/$id': typeof AuthenticatedAtividadesIdRoute
+  '/_authenticated/rondas/$id': typeof AuthenticatedRondasIdRoute
+  '/_authenticated/rondas/nova': typeof AuthenticatedRondasNovaRoute
+  '/_authenticated/atividades/': typeof AuthenticatedAtividadesIndexRoute
+  '/_authenticated/rondas/': typeof AuthenticatedRondasIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/painel'
+    | '/passagens'
+    | '/terceiros'
+    | '/atividades/$id'
+    | '/rondas/$id'
+    | '/rondas/nova'
+    | '/atividades/'
+    | '/rondas/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/auth'
+    | '/painel'
+    | '/passagens'
+    | '/terceiros'
+    | '/atividades/$id'
+    | '/rondas/$id'
+    | '/rondas/nova'
+    | '/atividades'
+    | '/rondas'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/_authenticated/painel'
+    | '/_authenticated/passagens'
+    | '/_authenticated/terceiros'
+    | '/_authenticated/atividades/$id'
+    | '/_authenticated/rondas/$id'
+    | '/_authenticated/rondas/nova'
+    | '/_authenticated/atividades/'
+    | '/_authenticated/rondas/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +172,108 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/painel': {
+      id: '/_authenticated/painel'
+      path: '/painel'
+      fullPath: '/painel'
+      preLoaderRoute: typeof AuthenticatedPainelRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/passagens': {
+      id: '/_authenticated/passagens'
+      path: '/passagens'
+      fullPath: '/passagens'
+      preLoaderRoute: typeof AuthenticatedPassagensRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/terceiros': {
+      id: '/_authenticated/terceiros'
+      path: '/terceiros'
+      fullPath: '/terceiros'
+      preLoaderRoute: typeof AuthenticatedTerceirosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/atividades/': {
+      id: '/_authenticated/atividades/'
+      path: '/atividades'
+      fullPath: '/atividades/'
+      preLoaderRoute: typeof AuthenticatedAtividadesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/atividades/$id': {
+      id: '/_authenticated/atividades/$id'
+      path: '/atividades/$id'
+      fullPath: '/atividades/$id'
+      preLoaderRoute: typeof AuthenticatedAtividadesIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/rondas/': {
+      id: '/_authenticated/rondas/'
+      path: '/rondas'
+      fullPath: '/rondas/'
+      preLoaderRoute: typeof AuthenticatedRondasIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/rondas/$id': {
+      id: '/_authenticated/rondas/$id'
+      path: '/rondas/$id'
+      fullPath: '/rondas/$id'
+      preLoaderRoute: typeof AuthenticatedRondasIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/rondas/nova': {
+      id: '/_authenticated/rondas/nova'
+      path: '/rondas/nova'
+      fullPath: '/rondas/nova'
+      preLoaderRoute: typeof AuthenticatedRondasNovaRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedPainelRoute: typeof AuthenticatedPainelRoute
+  AuthenticatedPassagensRoute: typeof AuthenticatedPassagensRoute
+  AuthenticatedTerceirosRoute: typeof AuthenticatedTerceirosRoute
+  AuthenticatedAtividadesIdRoute: typeof AuthenticatedAtividadesIdRoute
+  AuthenticatedRondasIdRoute: typeof AuthenticatedRondasIdRoute
+  AuthenticatedRondasNovaRoute: typeof AuthenticatedRondasNovaRoute
+  AuthenticatedAtividadesIndexRoute: typeof AuthenticatedAtividadesIndexRoute
+  AuthenticatedRondasIndexRoute: typeof AuthenticatedRondasIndexRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedPainelRoute: AuthenticatedPainelRoute,
+  AuthenticatedPassagensRoute: AuthenticatedPassagensRoute,
+  AuthenticatedTerceirosRoute: AuthenticatedTerceirosRoute,
+  AuthenticatedAtividadesIdRoute: AuthenticatedAtividadesIdRoute,
+  AuthenticatedRondasIdRoute: AuthenticatedRondasIdRoute,
+  AuthenticatedRondasNovaRoute: AuthenticatedRondasNovaRoute,
+  AuthenticatedAtividadesIndexRoute: AuthenticatedAtividadesIndexRoute,
+  AuthenticatedRondasIndexRoute: AuthenticatedRondasIndexRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
