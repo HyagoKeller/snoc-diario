@@ -80,8 +80,14 @@ function Terceiros() {
 
   async function checkin() {
     if (!user) return;
-    if (!pessoa.trim()) return toast.error("Informe o nome da pessoa.");
-    if (!consent) return toast.error("O consentimento de tratamento de dados (LGPD) é obrigatório.");
+    if (!pessoa.trim()) {
+      toast.error("Informe o nome da pessoa.");
+      return;
+    }
+    if (!consent) {
+      toast.error("O consentimento de tratamento de dados (LGPD) é obrigatório.");
+      return;
+    }
     setBusy(true);
     try {
       let foto: string | null = null;
@@ -125,7 +131,10 @@ function Terceiros() {
       .from("visitas")
       .update({ checkout_em: new Date().toISOString() })
       .eq("id", id);
-    if (error) return toast.error(error.message);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     await registrarAuditoria("checkout", "visitas", id);
     if (atividade_id) {
       await supabase
@@ -152,7 +161,10 @@ function Terceiros() {
   }
 
   async function criarFornecedor() {
-    if (!fNome.trim()) return toast.error("Informe a razão social.");
+    if (!fNome.trim()) {
+      toast.error("Informe a razão social.");
+      return;
+    }
     const { error } = await supabase.from("fornecedores").insert({
       razao_social: fNome,
       contato_nome: fContato || null,
@@ -161,7 +173,10 @@ function Terceiros() {
       validade_credencial: fValidade || null,
       tarefas_autorizadas: fTarefas || null,
     });
-    if (error) return toast.error(error.message);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     toast.success("Fornecedor cadastrado");
     setFNome("");
     setFContato("");

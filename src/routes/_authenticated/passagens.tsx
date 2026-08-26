@@ -108,9 +108,12 @@ function Passagens() {
   async function aceitar(id: string) {
     const { error } = await supabase
       .from("passagens_turno")
-      .update({ status_aceite: "aceito", aceito_em: new Date().toISOString(), operador_recebe_id: user?.id })
+      .update({ status_aceite: "aceito", aceito_em: new Date().toISOString(), operador_recebe_id: user?.id ?? null })
       .eq("id", id);
-    if (error) return toast.error(error.message);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     await registrarAuditoria("aceitar", "passagens_turno", id);
     toast.success("Passagem aceita");
     qc.invalidateQueries({ queryKey: ["passagens"] });

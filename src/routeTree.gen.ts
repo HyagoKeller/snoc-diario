@@ -13,6 +13,8 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedPainelRouteImport } from './routes/_authenticated/painel'
+import { Route as AuthenticatedPassagensRouteImport } from './routes/_authenticated/passagens'
+import { Route as AuthenticatedTerceirosRouteImport } from './routes/_authenticated/terceiros'
 import { Route as AuthenticatedRondasIndexRouteImport } from './routes/_authenticated/rondas/index'
 import { Route as AuthenticatedRondasIdRouteImport } from './routes/_authenticated/rondas/$id'
 import { Route as AuthenticatedRondasNovaRouteImport } from './routes/_authenticated/rondas/nova'
@@ -36,6 +38,16 @@ const AuthenticatedPainelRoute = AuthenticatedPainelRouteImport.update({
   path: '/painel',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedPassagensRoute = AuthenticatedPassagensRouteImport.update({
+  id: '/passagens',
+  path: '/passagens',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedTerceirosRoute = AuthenticatedTerceirosRouteImport.update({
+  id: '/terceiros',
+  path: '/terceiros',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedRondasIndexRoute =
   AuthenticatedRondasIndexRouteImport.update({
     id: '/rondas/',
@@ -57,6 +69,8 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/painel': typeof AuthenticatedPainelRoute
+  '/passagens': typeof AuthenticatedPassagensRoute
+  '/terceiros': typeof AuthenticatedTerceirosRoute
   '/rondas/$id': typeof AuthenticatedRondasIdRoute
   '/rondas/nova': typeof AuthenticatedRondasNovaRoute
   '/rondas/': typeof AuthenticatedRondasIndexRoute
@@ -65,6 +79,8 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/painel': typeof AuthenticatedPainelRoute
+  '/passagens': typeof AuthenticatedPassagensRoute
+  '/terceiros': typeof AuthenticatedTerceirosRoute
   '/rondas/$id': typeof AuthenticatedRondasIdRoute
   '/rondas/nova': typeof AuthenticatedRondasNovaRoute
   '/rondas': typeof AuthenticatedRondasIndexRoute
@@ -75,6 +91,8 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/painel': typeof AuthenticatedPainelRoute
+  '/_authenticated/passagens': typeof AuthenticatedPassagensRoute
+  '/_authenticated/terceiros': typeof AuthenticatedTerceirosRoute
   '/_authenticated/rondas/$id': typeof AuthenticatedRondasIdRoute
   '/_authenticated/rondas/nova': typeof AuthenticatedRondasNovaRoute
   '/_authenticated/rondas/': typeof AuthenticatedRondasIndexRoute
@@ -82,15 +100,32 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/auth' | '/painel' | '/rondas/$id' | '/rondas/nova' | '/rondas/'
+    | '/'
+    | '/auth'
+    | '/painel'
+    | '/passagens'
+    | '/terceiros'
+    | '/rondas/$id'
+    | '/rondas/nova'
+    | '/rondas/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/painel' | '/rondas/$id' | '/rondas/nova' | '/rondas'
+  to:
+    | '/'
+    | '/auth'
+    | '/painel'
+    | '/passagens'
+    | '/terceiros'
+    | '/rondas/$id'
+    | '/rondas/nova'
+    | '/rondas'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
     | '/_authenticated/painel'
+    | '/_authenticated/passagens'
+    | '/_authenticated/terceiros'
     | '/_authenticated/rondas/$id'
     | '/_authenticated/rondas/nova'
     | '/_authenticated/rondas/'
@@ -132,6 +167,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPainelRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/passagens': {
+      id: '/_authenticated/passagens'
+      path: '/passagens'
+      fullPath: '/passagens'
+      preLoaderRoute: typeof AuthenticatedPassagensRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/terceiros': {
+      id: '/_authenticated/terceiros'
+      path: '/terceiros'
+      fullPath: '/terceiros'
+      preLoaderRoute: typeof AuthenticatedTerceirosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rondas/': {
       id: '/_authenticated/rondas/'
       path: '/rondas'
@@ -158,6 +207,8 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedPainelRoute: typeof AuthenticatedPainelRoute
+  AuthenticatedPassagensRoute: typeof AuthenticatedPassagensRoute
+  AuthenticatedTerceirosRoute: typeof AuthenticatedTerceirosRoute
   AuthenticatedRondasIdRoute: typeof AuthenticatedRondasIdRoute
   AuthenticatedRondasNovaRoute: typeof AuthenticatedRondasNovaRoute
   AuthenticatedRondasIndexRoute: typeof AuthenticatedRondasIndexRoute
@@ -165,6 +216,8 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedPainelRoute: AuthenticatedPainelRoute,
+  AuthenticatedPassagensRoute: AuthenticatedPassagensRoute,
+  AuthenticatedTerceirosRoute: AuthenticatedTerceirosRoute,
   AuthenticatedRondasIdRoute: AuthenticatedRondasIdRoute,
   AuthenticatedRondasNovaRoute: AuthenticatedRondasNovaRoute,
   AuthenticatedRondasIndexRoute: AuthenticatedRondasIndexRoute,
