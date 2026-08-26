@@ -10,33 +10,96 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedPainelRouteImport } from './routes/_authenticated/painel'
+import { Route as AuthenticatedRondasIndexRouteImport } from './routes/_authenticated/rondas/index'
+import { Route as AuthenticatedRondasIdRouteImport } from './routes/_authenticated/rondas/$id'
+import { Route as AuthenticatedRondasNovaRouteImport } from './routes/_authenticated/rondas/nova'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedPainelRoute = AuthenticatedPainelRouteImport.update({
+  id: '/painel',
+  path: '/painel',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedRondasIndexRoute =
+  AuthenticatedRondasIndexRouteImport.update({
+    id: '/rondas/',
+    path: '/rondas/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedRondasIdRoute = AuthenticatedRondasIdRouteImport.update({
+  id: '/rondas/$id',
+  path: '/rondas/$id',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedRondasNovaRoute = AuthenticatedRondasNovaRouteImport.update({
+  id: '/rondas/nova',
+  path: '/rondas/nova',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/painel': typeof AuthenticatedPainelRoute
+  '/rondas/$id': typeof AuthenticatedRondasIdRoute
+  '/rondas/nova': typeof AuthenticatedRondasNovaRoute
+  '/rondas/': typeof AuthenticatedRondasIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/painel': typeof AuthenticatedPainelRoute
+  '/rondas/$id': typeof AuthenticatedRondasIdRoute
+  '/rondas/nova': typeof AuthenticatedRondasNovaRoute
+  '/rondas': typeof AuthenticatedRondasIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/_authenticated/painel': typeof AuthenticatedPainelRoute
+  '/_authenticated/rondas/$id': typeof AuthenticatedRondasIdRoute
+  '/_authenticated/rondas/nova': typeof AuthenticatedRondasNovaRoute
+  '/_authenticated/rondas/': typeof AuthenticatedRondasIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    '/' | '/auth' | '/painel' | '/rondas/$id' | '/rondas/nova' | '/rondas/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/auth' | '/painel' | '/rondas/$id' | '/rondas/nova' | '/rondas'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/_authenticated/painel'
+    | '/_authenticated/rondas/$id'
+    | '/_authenticated/rondas/nova'
+    | '/_authenticated/rondas/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +111,72 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/painel': {
+      id: '/_authenticated/painel'
+      path: '/painel'
+      fullPath: '/painel'
+      preLoaderRoute: typeof AuthenticatedPainelRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/rondas/': {
+      id: '/_authenticated/rondas/'
+      path: '/rondas'
+      fullPath: '/rondas/'
+      preLoaderRoute: typeof AuthenticatedRondasIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/rondas/$id': {
+      id: '/_authenticated/rondas/$id'
+      path: '/rondas/$id'
+      fullPath: '/rondas/$id'
+      preLoaderRoute: typeof AuthenticatedRondasIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/rondas/nova': {
+      id: '/_authenticated/rondas/nova'
+      path: '/rondas/nova'
+      fullPath: '/rondas/nova'
+      preLoaderRoute: typeof AuthenticatedRondasNovaRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedPainelRoute: typeof AuthenticatedPainelRoute
+  AuthenticatedRondasIdRoute: typeof AuthenticatedRondasIdRoute
+  AuthenticatedRondasNovaRoute: typeof AuthenticatedRondasNovaRoute
+  AuthenticatedRondasIndexRoute: typeof AuthenticatedRondasIndexRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedPainelRoute: AuthenticatedPainelRoute,
+  AuthenticatedRondasIdRoute: AuthenticatedRondasIdRoute,
+  AuthenticatedRondasNovaRoute: AuthenticatedRondasNovaRoute,
+  AuthenticatedRondasIndexRoute: AuthenticatedRondasIndexRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

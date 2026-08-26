@@ -38,7 +38,7 @@ export const Route = createFileRoute("/_authenticated/rondas/nova")({
   component: NovaRonda,
 });
 
-type ItemState = { status: ItemStatus; observacao: string; foto?: File };
+type ItemState = { status: ItemStatus; observacao: string; foto?: File | undefined };
 
 const CRITS: Criticidade[] = ["baixa", "media", "alta", "critica"];
 
@@ -214,7 +214,7 @@ function NovaRonda() {
             <div className="flex items-center gap-2">
               <span className="label-mono">Criticidade da seção</span>
               <Select
-                value={criticidades[secao.secao]}
+                value={criticidades[secao.secao] ?? "baixa"}
                 onValueChange={(v) =>
                   setCriticidades((p) => ({ ...p, [secao.secao]: v as Criticidade }))
                 }
