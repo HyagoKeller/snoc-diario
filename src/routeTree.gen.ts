@@ -15,6 +15,8 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedPainelRouteImport } from './routes/_authenticated/painel'
 import { Route as AuthenticatedPassagensRouteImport } from './routes/_authenticated/passagens'
 import { Route as AuthenticatedTerceirosRouteImport } from './routes/_authenticated/terceiros'
+import { Route as AuthenticatedAtividadesIndexRouteImport } from './routes/_authenticated/atividades/index'
+import { Route as AuthenticatedAtividadesIdRouteImport } from './routes/_authenticated/atividades/$id'
 import { Route as AuthenticatedRondasIndexRouteImport } from './routes/_authenticated/rondas/index'
 import { Route as AuthenticatedRondasIdRouteImport } from './routes/_authenticated/rondas/$id'
 import { Route as AuthenticatedRondasNovaRouteImport } from './routes/_authenticated/rondas/nova'
@@ -48,6 +50,18 @@ const AuthenticatedTerceirosRoute = AuthenticatedTerceirosRouteImport.update({
   path: '/terceiros',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAtividadesIndexRoute =
+  AuthenticatedAtividadesIndexRouteImport.update({
+    id: '/atividades/',
+    path: '/atividades/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAtividadesIdRoute =
+  AuthenticatedAtividadesIdRouteImport.update({
+    id: '/atividades/$id',
+    path: '/atividades/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedRondasIndexRoute =
   AuthenticatedRondasIndexRouteImport.update({
     id: '/rondas/',
@@ -71,8 +85,10 @@ export interface FileRoutesByFullPath {
   '/painel': typeof AuthenticatedPainelRoute
   '/passagens': typeof AuthenticatedPassagensRoute
   '/terceiros': typeof AuthenticatedTerceirosRoute
+  '/atividades/$id': typeof AuthenticatedAtividadesIdRoute
   '/rondas/$id': typeof AuthenticatedRondasIdRoute
   '/rondas/nova': typeof AuthenticatedRondasNovaRoute
+  '/atividades/': typeof AuthenticatedAtividadesIndexRoute
   '/rondas/': typeof AuthenticatedRondasIndexRoute
 }
 export interface FileRoutesByTo {
@@ -81,8 +97,10 @@ export interface FileRoutesByTo {
   '/painel': typeof AuthenticatedPainelRoute
   '/passagens': typeof AuthenticatedPassagensRoute
   '/terceiros': typeof AuthenticatedTerceirosRoute
+  '/atividades/$id': typeof AuthenticatedAtividadesIdRoute
   '/rondas/$id': typeof AuthenticatedRondasIdRoute
   '/rondas/nova': typeof AuthenticatedRondasNovaRoute
+  '/atividades': typeof AuthenticatedAtividadesIndexRoute
   '/rondas': typeof AuthenticatedRondasIndexRoute
 }
 export interface FileRoutesById {
@@ -93,8 +111,10 @@ export interface FileRoutesById {
   '/_authenticated/painel': typeof AuthenticatedPainelRoute
   '/_authenticated/passagens': typeof AuthenticatedPassagensRoute
   '/_authenticated/terceiros': typeof AuthenticatedTerceirosRoute
+  '/_authenticated/atividades/$id': typeof AuthenticatedAtividadesIdRoute
   '/_authenticated/rondas/$id': typeof AuthenticatedRondasIdRoute
   '/_authenticated/rondas/nova': typeof AuthenticatedRondasNovaRoute
+  '/_authenticated/atividades/': typeof AuthenticatedAtividadesIndexRoute
   '/_authenticated/rondas/': typeof AuthenticatedRondasIndexRoute
 }
 export interface FileRouteTypes {
@@ -105,8 +125,10 @@ export interface FileRouteTypes {
     | '/painel'
     | '/passagens'
     | '/terceiros'
+    | '/atividades/$id'
     | '/rondas/$id'
     | '/rondas/nova'
+    | '/atividades/'
     | '/rondas/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -115,8 +137,10 @@ export interface FileRouteTypes {
     | '/painel'
     | '/passagens'
     | '/terceiros'
+    | '/atividades/$id'
     | '/rondas/$id'
     | '/rondas/nova'
+    | '/atividades'
     | '/rondas'
   id:
     | '__root__'
@@ -126,8 +150,10 @@ export interface FileRouteTypes {
     | '/_authenticated/painel'
     | '/_authenticated/passagens'
     | '/_authenticated/terceiros'
+    | '/_authenticated/atividades/$id'
     | '/_authenticated/rondas/$id'
     | '/_authenticated/rondas/nova'
+    | '/_authenticated/atividades/'
     | '/_authenticated/rondas/'
   fileRoutesById: FileRoutesById
 }
@@ -181,6 +207,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTerceirosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/atividades/': {
+      id: '/_authenticated/atividades/'
+      path: '/atividades'
+      fullPath: '/atividades/'
+      preLoaderRoute: typeof AuthenticatedAtividadesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/atividades/$id': {
+      id: '/_authenticated/atividades/$id'
+      path: '/atividades/$id'
+      fullPath: '/atividades/$id'
+      preLoaderRoute: typeof AuthenticatedAtividadesIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rondas/': {
       id: '/_authenticated/rondas/'
       path: '/rondas'
@@ -209,8 +249,10 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedPainelRoute: typeof AuthenticatedPainelRoute
   AuthenticatedPassagensRoute: typeof AuthenticatedPassagensRoute
   AuthenticatedTerceirosRoute: typeof AuthenticatedTerceirosRoute
+  AuthenticatedAtividadesIdRoute: typeof AuthenticatedAtividadesIdRoute
   AuthenticatedRondasIdRoute: typeof AuthenticatedRondasIdRoute
   AuthenticatedRondasNovaRoute: typeof AuthenticatedRondasNovaRoute
+  AuthenticatedAtividadesIndexRoute: typeof AuthenticatedAtividadesIndexRoute
   AuthenticatedRondasIndexRoute: typeof AuthenticatedRondasIndexRoute
 }
 
@@ -218,8 +260,10 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedPainelRoute: AuthenticatedPainelRoute,
   AuthenticatedPassagensRoute: AuthenticatedPassagensRoute,
   AuthenticatedTerceirosRoute: AuthenticatedTerceirosRoute,
+  AuthenticatedAtividadesIdRoute: AuthenticatedAtividadesIdRoute,
   AuthenticatedRondasIdRoute: AuthenticatedRondasIdRoute,
   AuthenticatedRondasNovaRoute: AuthenticatedRondasNovaRoute,
+  AuthenticatedAtividadesIndexRoute: AuthenticatedAtividadesIndexRoute,
   AuthenticatedRondasIndexRoute: AuthenticatedRondasIndexRoute,
 }
 
