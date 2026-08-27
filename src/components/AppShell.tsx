@@ -55,7 +55,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <span className="ml-auto hidden text-xs opacity-80 sm:block">DTI-AGU</span>
       </div>
       <div className="flex min-h-0 flex-1">
-      <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-sidebar-border bg-sidebar p-4 lg:flex">
+      <aside className="sticky top-0 hidden h-[calc(100vh-3.75rem)] w-64 shrink-0 flex-col self-start border-r border-sidebar-border bg-sidebar p-4 lg:flex">
 
         <Link to="/painel" className="flex items-center gap-3 px-2 py-3">
           <div className="flex size-9 items-center justify-center rounded-md bg-primary/15 text-primary">
