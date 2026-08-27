@@ -97,6 +97,9 @@ function Passagens() {
       setStatusSistemas("");
       setIncidentes("");
       setMudancas("");
+      setTier0("");
+      setConting(false);
+      setContingDesc("");
       qc.invalidateQueries({ queryKey: ["passagens"] });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Falha ao registrar passagem");
