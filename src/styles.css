@@ -67,8 +67,12 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
-  --shadow-panel: 0 1px 0 0 oklch(1 0 0 / 6%) inset, 0 18px 40px -24px oklch(0 0 0 / 70%);
-  --shadow-glow: 0 0 0 1px oklch(0.78 0.13 195 / 35%), 0 0 28px -6px oklch(0.78 0.13 195 / 35%);
+  --color-topbar: var(--topbar);
+  --color-topbar-foreground: var(--topbar-foreground);
+
+  --shadow-panel: 0 1px 0 0 oklch(1 0 0 / 6%) inset, 0 18px 40px -24px oklch(0 0 0 / 60%);
+  --shadow-glow: 0 0 0 1px oklch(0.62 0.19 268 / 40%), 0 0 28px -6px oklch(0.62 0.19 268 / 40%);
+
 }
 
 :root {
