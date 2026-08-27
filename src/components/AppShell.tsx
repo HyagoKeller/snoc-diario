@@ -98,16 +98,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex items-center justify-between gap-3 border-b border-border px-4 py-3 lg:hidden">
-          <Link to="/painel" className="flex items-center gap-2">
-            <Activity className="size-5 text-primary" />
-            <span className="font-display font-bold">SNOC OPS</span>
-          </Link>
-          <Button variant="ghost" size="sm" onClick={sair}>
-            <LogOut className="size-4" />
-          </Button>
-        </header>
-        <nav className="flex gap-1 overflow-x-auto border-b border-border px-2 py-2 lg:hidden">
+        <nav className="flex items-center gap-1 overflow-x-auto border-b border-border px-2 py-2 lg:hidden">
           {items.map((item) => (
             <Link
               key={item.to}
@@ -117,9 +108,14 @@ export function AppShell({ children }: { children: ReactNode }) {
               {item.label}
             </Link>
           ))}
+          <Button variant="ghost" size="sm" className="ml-auto" onClick={sair}>
+            <LogOut className="size-4" />
+          </Button>
         </nav>
         <main className="min-w-0 flex-1 p-4 sm:p-6">{children}</main>
       </div>
+      </div>
     </div>
   );
+
 }
