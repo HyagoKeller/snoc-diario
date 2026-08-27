@@ -212,6 +212,27 @@ function Passagens() {
             <Label>Mudanças realizadas no turno</Label>
             <Textarea value={mudancas} onChange={(e) => setMudancas(e.target.value)} />
           </div>
+          <div className="space-y-2">
+            <Label>Status dos serviços Tier 0 (críticos indisponíveis afetam a Advocacia)</Label>
+            <Textarea
+              value={tier0}
+              onChange={(e) => setTier0(e.target.value)}
+              placeholder="Sapiens: normal · e-AGU: normal · SEI: degradado"
+            />
+          </div>
+          <label className="flex items-start gap-3 rounded-md border border-border p-3 text-sm">
+            <Checkbox checked={conting} onCheckedChange={(v) => setConting(v === true)} />
+            <span className="text-muted-foreground">
+              Turno encerrado com plano de contingência ativo (link redundante, gerador, bypass,
+              operação manual).
+            </span>
+          </label>
+          {conting ? (
+            <div className="space-y-2">
+              <Label>Descrição da contingência ativa</Label>
+              <Textarea value={contingDesc} onChange={(e) => setContingDesc(e.target.value)} />
+            </div>
+          ) : null}
 
           <div className="space-y-3">
             <div className="flex items-center justify-between">
