@@ -42,6 +42,9 @@ function Passagens() {
   const [incidentes, setIncidentes] = useState("");
   const [mudancas, setMudancas] = useState("");
   const [pendencias, setPendencias] = useState<Pendencia[]>([]);
+  const [tier0, setTier0] = useState("");
+  const [conting, setConting] = useState(false);
+  const [contingDesc, setContingDesc] = useState("");
   const [busy, setBusy] = useState(false);
 
   const { data } = useQuery({
