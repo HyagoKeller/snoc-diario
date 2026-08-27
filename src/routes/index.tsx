@@ -100,10 +100,13 @@ function Landing() {
       </section>
 
       <footer className="border-t border-border py-6">
-        <p className="mx-auto max-w-5xl px-6 text-xs text-muted-foreground">
-          SNOC OPS · DTI-AGU. Dados pessoais de terceiros tratados conforme a LGPD, com
-          consentimento registrado no check-in.
-        </p>
+        <div className="mx-auto max-w-5xl space-y-1 px-6 text-xs text-muted-foreground">
+          <p>
+            SNOC OPS · DTI-AGU. Dados pessoais de terceiros tratados conforme a LGPD, com
+            consentimento registrado no check-in.
+          </p>
+          <p className="opacity-60">Desenvolvido por Hyago Keller.</p>
+        </div>
       </footer>
     </main>
   );
