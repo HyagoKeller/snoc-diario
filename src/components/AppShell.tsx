@@ -45,8 +45,18 @@ export function AppShell({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="flex min-h-screen">
-      <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-sidebar-border bg-sidebar p-4 lg:flex">
+    <div className="flex min-h-screen flex-col">
+      <div className="faixa-gov" />
+      <div className="flex items-center gap-3 bg-topbar px-4 py-3 text-topbar-foreground shadow-md">
+        <Activity className="size-5 shrink-0" />
+        <p className="font-display truncate text-sm font-semibold sm:text-base">
+          SNOC OPS — Operação do Data Center
+        </p>
+        <span className="ml-auto hidden text-xs opacity-80 sm:block">DTI-AGU</span>
+      </div>
+      <div className="flex min-h-0 flex-1">
+      <aside className="sticky top-0 hidden h-[calc(100vh-3.75rem)] w-64 shrink-0 flex-col self-start border-r border-sidebar-border bg-sidebar p-4 lg:flex">
+
         <Link to="/painel" className="flex items-center gap-3 px-2 py-3">
           <div className="flex size-9 items-center justify-center rounded-md bg-primary/15 text-primary">
             <Activity className="size-5" />
@@ -88,16 +98,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex items-center justify-between gap-3 border-b border-border px-4 py-3 lg:hidden">
-          <Link to="/painel" className="flex items-center gap-2">
-            <Activity className="size-5 text-primary" />
-            <span className="font-display font-bold">SNOC OPS</span>
-          </Link>
-          <Button variant="ghost" size="sm" onClick={sair}>
-            <LogOut className="size-4" />
-          </Button>
-        </header>
-        <nav className="flex gap-1 overflow-x-auto border-b border-border px-2 py-2 lg:hidden">
+        <nav className="flex items-center gap-1 overflow-x-auto border-b border-border px-2 py-2 lg:hidden">
           {items.map((item) => (
             <Link
               key={item.to}
@@ -107,9 +108,14 @@ export function AppShell({ children }: { children: ReactNode }) {
               {item.label}
             </Link>
           ))}
+          <Button variant="ghost" size="sm" className="ml-auto" onClick={sair}>
+            <LogOut className="size-4" />
+          </Button>
         </nav>
         <main className="min-w-0 flex-1 p-4 sm:p-6">{children}</main>
       </div>
+      </div>
     </div>
   );
+
 }

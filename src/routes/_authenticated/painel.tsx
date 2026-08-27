@@ -54,16 +54,29 @@ function Card({
         : tone === "ok"
           ? "text-ok"
           : "text-primary";
+  const tileClass =
+    tone === "critico"
+      ? "bg-critico/15 text-critico"
+      : tone === "atencao"
+        ? "bg-atencao/15 text-atencao"
+        : tone === "ok"
+          ? "bg-ok/15 text-ok"
+          : "bg-primary/15 text-primary";
   return (
-    <div className="panel p-5">
-      <div className="flex items-center justify-between">
+    <div className="panel p-5 transition-colors hover:border-primary/40">
+      <div className="flex items-center gap-3">
+        {Icon ? (
+          <span className={`flex size-9 items-center justify-center rounded-md ${tileClass}`}>
+            <Icon className="size-4" />
+          </span>
+        ) : null}
         <p className="label-mono">{titulo}</p>
-        {Icon ? <Icon className={`size-4 ${toneClass}`} /> : null}
       </div>
       <p className={`mt-3 font-display text-3xl font-bold ${toneClass}`}>{valor}</p>
       {detalhe ? <p className="mt-1 text-xs text-muted-foreground">{detalhe}</p> : null}
     </div>
   );
+
 }
 
 function Painel() {
