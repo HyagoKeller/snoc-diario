@@ -73,6 +73,9 @@ function Passagens() {
           status_sistemas: statusSistemas || null,
           incidentes_ativos: incidentes || null,
           mudancas_realizadas: mudancas || null,
+          status_servicos_tier0: tier0 || null,
+          contingencia_ativa: conting,
+          contingencia_descricao: conting ? contingDesc || null : null,
           prazo_aceite: prazo,
         })
         .select()
