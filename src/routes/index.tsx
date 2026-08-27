@@ -10,12 +10,12 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Ambiente institucional de operação do Data Center da AGU: rondas, passagem de turno, acesso de terceiros e ordens de serviço. Acesso restrito à equipe do SNOC.",
+          "Diário de bordo operacional do SNOC da AGU: rondas, passagem de turno, gestão de acesso de terceiros e ordens de serviço. Acesso restrito à equipe do SNOC.",
       },
       { property: "og:title", content: "SNOC OPS — acesso institucional" },
       {
         property: "og:description",
-        content: "Sistema interno de operação do Data Center. Acesso restrito e monitorado.",
+        content: "Diário de bordo operacional do SNOC. Acesso restrito e monitorado.",
       },
     ],
   }),
@@ -37,7 +37,7 @@ function Landing() {
 
       <header className="border-b border-border">
         <div className="mx-auto grid max-w-5xl grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-6 py-4">
-          <p className="label-mono truncate">Advocacia-Geral da União · DTI</p>
+          <p className="label-mono truncate">Advocacia-Geral da União · SGG · DTI-CSI</p>
           <Link
             to="/faq"
             className="flex shrink-0 items-center gap-2 text-xs text-muted-foreground transition-colors hover:text-foreground"
@@ -52,14 +52,14 @@ function Landing() {
           <Activity className="size-7" />
         </div>
 
-        <p className="label-mono mt-6">Secretaria-Geral de Administração · DTI</p>
-        <p className="label-mono">Serviço de Network Operations Center — SNOC</p>
+        <p className="label-mono mt-6">Secretaria de Governança e Gestão Estratégica</p>
+        <p className="label-mono">DTI — Coordenação de Segurança da Informação</p>
 
         <h1 className="mt-4 text-4xl font-bold sm:text-5xl">
           SNOC <span className="text-primary">OPS</span>
         </h1>
         <p className="mt-4 max-w-xl text-sm text-muted-foreground sm:text-base">
-          Registro operacional do Data Center: rondas, passagem de turno, acesso de terceiros e
+          Diário de bordo operacional: rondas, passagem de turno, gestão de acesso de terceiros e
           ordens de serviço.
         </p>
 
