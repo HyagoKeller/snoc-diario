@@ -103,8 +103,14 @@ function Faq() {
         <h1 className="mt-2 text-3xl font-bold">Perguntas frequentes</h1>
         <p className="mt-3 text-sm text-muted-foreground">
           Os formulários em papel e PDF do SNOC passaram a ser registro digital com evidência,
-          prazo de aceite, escalonamento automático e histórico auditável.
+          prazo de aceite, escalonamento automático e histórico auditável. Para o passo a passo de
+          cada tela, consulte o{" "}
+          <Link to="/manual" className="text-primary hover:underline">
+            manual de utilização
+          </Link>
+          .
         </p>
+
 
         <h2 className="mt-10 text-lg font-semibold">O que o sistema registra</h2>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
