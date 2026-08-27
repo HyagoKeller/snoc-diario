@@ -285,6 +285,30 @@ function Admin() {
             ) : null}
           </div>
         </TabsContent>
+
+        <TabsContent value="integracoes" className="space-y-4 pt-4">
+          <section className="panel space-y-4 p-5">
+            <h2 className="text-base font-semibold">InvGate (Service Desk / ITSM)</h2>
+            <p className="text-sm text-muted-foreground">
+              A URL base é usada para consultar e abrir chamados vinculados a rondas e ordens de
+              serviço. O token de API fica guardado como segredo do servidor e nunca aparece aqui.
+            </p>
+            <div className="grid gap-4 sm:grid-cols-[1fr_auto] sm:items-end">
+              <div className="space-y-2">
+                <Label>URL base do InvGate</Label>
+                <Input
+                  value={baseUrl}
+                  onChange={(e) => setBaseUrl(e.target.value)}
+                  placeholder="https://agu.sd.cloud.invgate.net"
+                />
+              </div>
+              <Button onClick={salvarIntegracao}>Salvar</Button>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Atualizado {fmtDateTime(data?.integracoes?.updated_at)}.
+            </p>
+          </section>
+        </TabsContent>
       </Tabs>
     </div>
   );
