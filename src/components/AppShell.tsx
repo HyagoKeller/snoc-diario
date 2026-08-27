@@ -45,8 +45,18 @@ export function AppShell({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen flex-col">
+      <div className="faixa-gov" />
+      <div className="flex items-center gap-3 bg-topbar px-4 py-3 text-topbar-foreground shadow-md">
+        <Activity className="size-5 shrink-0" />
+        <p className="font-display truncate text-sm font-semibold sm:text-base">
+          SNOC OPS — Operação do Data Center
+        </p>
+        <span className="ml-auto hidden text-xs opacity-80 sm:block">DTI-AGU</span>
+      </div>
+      <div className="flex min-h-0 flex-1">
       <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-sidebar-border bg-sidebar p-4 lg:flex">
+
         <Link to="/painel" className="flex items-center gap-3 px-2 py-3">
           <div className="flex size-9 items-center justify-center rounded-md bg-primary/15 text-primary">
             <Activity className="size-5" />
