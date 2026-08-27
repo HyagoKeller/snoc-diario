@@ -16,6 +16,8 @@ export type Database = {
     Tables: {
       atividade_evidencias: {
         Row: {
+          aprovado_em: string | null
+          aprovado_por: string | null
           arquivo_url: string
           atividade_id: string
           descricao: string | null
@@ -25,6 +27,8 @@ export type Database = {
           tipo: Database["public"]["Enums"]["evidencia_tipo"]
         }
         Insert: {
+          aprovado_em?: string | null
+          aprovado_por?: string | null
           arquivo_url: string
           atividade_id: string
           descricao?: string | null
@@ -34,6 +38,8 @@ export type Database = {
           tipo: Database["public"]["Enums"]["evidencia_tipo"]
         }
         Update: {
+          aprovado_em?: string | null
+          aprovado_por?: string | null
           arquivo_url?: string
           atividade_id?: string
           descricao?: string | null
@@ -57,15 +63,21 @@ export type Database = {
           aberta_em: string
           aberta_por: string
           ativo_afetado: string | null
+          chamado_itsm: string | null
+          chamado_itsm_cache: Json | null
           codigo: number
           criticidade: Database["public"]["Enums"]["criticidade"]
+          custo: number | null
           descricao: string | null
           email_enviado_em: string | null
           fechada_em: string | null
           fornecedor_id: string | null
+          garantia_ate: string | null
           id: string
           janela_fim: string | null
           janela_inicio: string | null
+          nota_fiscal_url: string | null
+          numero_os_fornecedor: string | null
           status: Database["public"]["Enums"]["atividade_status"]
           tipo: Database["public"]["Enums"]["atividade_tipo"]
           titulo: string
@@ -75,15 +87,21 @@ export type Database = {
           aberta_em?: string
           aberta_por: string
           ativo_afetado?: string | null
+          chamado_itsm?: string | null
+          chamado_itsm_cache?: Json | null
           codigo?: number
           criticidade?: Database["public"]["Enums"]["criticidade"]
+          custo?: number | null
           descricao?: string | null
           email_enviado_em?: string | null
           fechada_em?: string | null
           fornecedor_id?: string | null
+          garantia_ate?: string | null
           id?: string
           janela_fim?: string | null
           janela_inicio?: string | null
+          nota_fiscal_url?: string | null
+          numero_os_fornecedor?: string | null
           status?: Database["public"]["Enums"]["atividade_status"]
           tipo: Database["public"]["Enums"]["atividade_tipo"]
           titulo: string
@@ -93,15 +111,21 @@ export type Database = {
           aberta_em?: string
           aberta_por?: string
           ativo_afetado?: string | null
+          chamado_itsm?: string | null
+          chamado_itsm_cache?: Json | null
           codigo?: number
           criticidade?: Database["public"]["Enums"]["criticidade"]
+          custo?: number | null
           descricao?: string | null
           email_enviado_em?: string | null
           fechada_em?: string | null
           fornecedor_id?: string | null
+          garantia_ate?: string | null
           id?: string
           janela_fim?: string | null
           janela_inicio?: string | null
+          nota_fiscal_url?: string | null
+          numero_os_fornecedor?: string | null
           status?: Database["public"]["Enums"]["atividade_status"]
           tipo?: Database["public"]["Enums"]["atividade_tipo"]
           titulo?: string
@@ -149,7 +173,10 @@ export type Database = {
       }
       fornecedores: {
         Row: {
+          apolice_seguro: string | null
           ativo: boolean
+          avaliacao_media: number | null
+          cnpj: string | null
           contato_email: string | null
           contato_nome: string | null
           contato_telefone: string | null
@@ -157,12 +184,16 @@ export type Database = {
           documento: string | null
           id: string
           razao_social: string
+          seguro_validade: string | null
           tarefas_autorizadas: string | null
           updated_at: string
           validade_credencial: string | null
         }
         Insert: {
+          apolice_seguro?: string | null
           ativo?: boolean
+          avaliacao_media?: number | null
+          cnpj?: string | null
           contato_email?: string | null
           contato_nome?: string | null
           contato_telefone?: string | null
@@ -170,12 +201,16 @@ export type Database = {
           documento?: string | null
           id?: string
           razao_social: string
+          seguro_validade?: string | null
           tarefas_autorizadas?: string | null
           updated_at?: string
           validade_credencial?: string | null
         }
         Update: {
+          apolice_seguro?: string | null
           ativo?: boolean
+          avaliacao_media?: number | null
+          cnpj?: string | null
           contato_email?: string | null
           contato_nome?: string | null
           contato_telefone?: string | null
@@ -183,9 +218,34 @@ export type Database = {
           documento?: string | null
           id?: string
           razao_social?: string
+          seguro_validade?: string | null
           tarefas_autorizadas?: string | null
           updated_at?: string
           validade_credencial?: string | null
+        }
+        Relationships: []
+      }
+      integracoes_config: {
+        Row: {
+          atualizado_por: string | null
+          chave: string
+          id: string
+          updated_at: string
+          valor: string
+        }
+        Insert: {
+          atualizado_por?: string | null
+          chave: string
+          id?: string
+          updated_at?: string
+          valor: string
+        }
+        Update: {
+          atualizado_por?: string | null
+          chave?: string
+          id?: string
+          updated_at?: string
+          valor?: string
         }
         Relationships: []
       }
@@ -269,6 +329,8 @@ export type Database = {
       passagens_turno: {
         Row: {
           aceito_em: string | null
+          contingencia_ativa: boolean
+          contingencia_descricao: string | null
           created_at: string
           data: string
           id: string
@@ -278,12 +340,15 @@ export type Database = {
           operador_recebe_id: string | null
           prazo_aceite: string
           status_aceite: Database["public"]["Enums"]["aceite_status"]
+          status_servicos_tier0: string | null
           status_sistemas: string | null
           turno: string
           updated_at: string
         }
         Insert: {
           aceito_em?: string | null
+          contingencia_ativa?: boolean
+          contingencia_descricao?: string | null
           created_at?: string
           data?: string
           id?: string
@@ -293,12 +358,15 @@ export type Database = {
           operador_recebe_id?: string | null
           prazo_aceite?: string
           status_aceite?: Database["public"]["Enums"]["aceite_status"]
+          status_servicos_tier0?: string | null
           status_sistemas?: string | null
           turno: string
           updated_at?: string
         }
         Update: {
           aceito_em?: string | null
+          contingencia_ativa?: boolean
+          contingencia_descricao?: string | null
           created_at?: string
           data?: string
           id?: string
@@ -308,6 +376,7 @@ export type Database = {
           operador_recebe_id?: string | null
           prazo_aceite?: string
           status_aceite?: Database["public"]["Enums"]["aceite_status"]
+          status_servicos_tier0?: string | null
           status_sistemas?: string | null
           turno?: string
           updated_at?: string
@@ -453,6 +522,8 @@ export type Database = {
       }
       rondas: {
         Row: {
+          chamado_itsm: string | null
+          chamado_itsm_cache: Json | null
           created_at: string
           data: string
           finalizada: boolean
@@ -461,6 +532,7 @@ export type Database = {
           observacoes: string | null
           responsavel_id: string
           resultado_geral: Database["public"]["Enums"]["criticidade"]
+          ronda_anterior_id: string | null
           temperatura: number | null
           total_nc: number
           turno: string
@@ -468,6 +540,8 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          chamado_itsm?: string | null
+          chamado_itsm_cache?: Json | null
           created_at?: string
           data?: string
           finalizada?: boolean
@@ -476,6 +550,7 @@ export type Database = {
           observacoes?: string | null
           responsavel_id: string
           resultado_geral?: Database["public"]["Enums"]["criticidade"]
+          ronda_anterior_id?: string | null
           temperatura?: number | null
           total_nc?: number
           turno: string
@@ -483,6 +558,8 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          chamado_itsm?: string | null
+          chamado_itsm_cache?: Json | null
           created_at?: string
           data?: string
           finalizada?: boolean
@@ -491,13 +568,22 @@ export type Database = {
           observacoes?: string | null
           responsavel_id?: string
           resultado_geral?: Database["public"]["Enums"]["criticidade"]
+          ronda_anterior_id?: string | null
           temperatura?: number | null
           total_nc?: number
           turno?: string
           umidade?: number | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "rondas_ronda_anterior_id_fkey"
+            columns: ["ronda_anterior_id"]
+            isOneToOne: false
+            referencedRelation: "rondas"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
@@ -533,8 +619,11 @@ export type Database = {
           fornecedor_id: string | null
           foto_documento_url: string | null
           id: string
+          motivo_visita: string | null
           pessoa_nome: string
+          placa_veiculo: string | null
           registrado_por: string
+          tipo_documento: string | null
           updated_at: string
           zona: string
         }
@@ -550,8 +639,11 @@ export type Database = {
           fornecedor_id?: string | null
           foto_documento_url?: string | null
           id?: string
+          motivo_visita?: string | null
           pessoa_nome: string
+          placa_veiculo?: string | null
           registrado_por: string
+          tipo_documento?: string | null
           updated_at?: string
           zona?: string
         }
@@ -567,8 +659,11 @@ export type Database = {
           fornecedor_id?: string | null
           foto_documento_url?: string | null
           id?: string
+          motivo_visita?: string | null
           pessoa_nome?: string
+          placa_veiculo?: string | null
           registrado_por?: string
+          tipo_documento?: string | null
           updated_at?: string
           zona?: string
         }
