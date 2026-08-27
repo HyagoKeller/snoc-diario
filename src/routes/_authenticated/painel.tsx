@@ -186,6 +186,23 @@ function Painel() {
         />
       </div>
 
+      {contingencia ? (
+        <div className="panel border-atencao/50 bg-atencao/10 p-4">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="mt-0.5 size-5 text-atencao" />
+            <div>
+              <p className="font-semibold">Contingência ativa registrada na passagem de turno</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {contingencia.contingencia_descricao || "Sem descrição registrada."}
+              </p>
+              <Button asChild variant="outline" size="sm" className="mt-3">
+                <Link to="/passagens">Ver passagem de turno</Link>
+              </Button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
       {atrasados.length > 0 ? (
         <div className="panel border-critico/50 bg-critico/10 p-4">
           <div className="flex items-start gap-3">
