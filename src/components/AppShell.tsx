@@ -52,8 +52,16 @@ export function AppShell({ children }: { children: ReactNode }) {
         <p className="font-display truncate text-sm font-semibold sm:text-base">
           SNOC OPS — Operação do Data Center
         </p>
-        <span className="ml-auto hidden text-xs opacity-80 sm:block">DTI-AGU</span>
-      </div>
+        <span className="ml-auto hidden items-center gap-4 text-xs opacity-90 sm:flex">
+          <Link to="/manual" className="hover:underline">
+            Manual
+          </Link>
+          <Link to="/faq" className="hover:underline">
+            FAQ
+          </Link>
+          <span className="opacity-80">DTI-AGU</span>
+        </span>
+
       <div className="flex min-h-0 flex-1">
       <aside className="sticky top-0 hidden h-[calc(100vh-3.75rem)] w-64 shrink-0 flex-col self-start border-r border-sidebar-border bg-sidebar p-4 lg:flex">
 
