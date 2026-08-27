@@ -55,8 +55,8 @@ function Landing() {
         <p className="label-mono mt-6">Secretaria de Governança e Gestão Estratégica</p>
         <p className="label-mono">DTI — Coordenação de Segurança da Informação</p>
 
-        <h1 className="mt-4 text-4xl font-bold sm:text-5xl">
-          SNOC <span className="text-primary">OPS</span>
+        <h1 className="mt-4 text-4xl font-bold text-primary sm:text-5xl">
+          SNOC
         </h1>
         <p className="mt-4 max-w-xl text-sm text-muted-foreground sm:text-base">
           Diário de bordo operacional: rondas, passagem de turno, gestão de acesso de terceiros e
