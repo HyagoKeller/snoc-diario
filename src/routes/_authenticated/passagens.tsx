@@ -335,10 +335,25 @@ function Passagens() {
                 </div>
               </div>
 
-              <dl className="mt-4 grid gap-4 text-sm sm:grid-cols-3">
+              {p.contingencia_ativa ? (
+                <div className="mt-4 rounded-md border border-critico/50 bg-critico/10 p-3 text-sm">
+                  <p className="flex items-center gap-2 font-semibold text-critico">
+                    <AlertTriangle className="size-4" /> Contingência ativa
+                  </p>
+                  <p className="mt-1 text-muted-foreground">
+                    {p.contingencia_descricao || "Sem descrição registrada."}
+                  </p>
+                </div>
+              ) : null}
+
+              <dl className="mt-4 grid gap-4 text-sm sm:grid-cols-2 lg:grid-cols-4">
                 <div>
                   <dt className="label-mono">Sistemas</dt>
                   <dd className="mt-1 text-muted-foreground">{p.status_sistemas || "—"}</dd>
+                </div>
+                <div>
+                  <dt className="label-mono">Serviços Tier 0</dt>
+                  <dd className="mt-1 text-muted-foreground">{p.status_servicos_tier0 || "—"}</dd>
                 </div>
                 <div>
                   <dt className="label-mono">Incidentes ativos</dt>
