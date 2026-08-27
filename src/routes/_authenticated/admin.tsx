@@ -44,30 +44,64 @@ function Admin() {
   const [prazo, setPrazo] = useState("15");
   const [nivel, setNivel] = useState("1");
   const [destinatarios, setDestinatarios] = useState("");
+  const [baseUrl, setBaseUrl] = useState("");
 
   const { data } = useQuery({
     queryKey: ["admin"],
     queryFn: async () => {
-      const [{ data: perfis }, { data: papeis }, { data: regras }, { data: notifs }, { data: aud }] =
-        await Promise.all([
-          supabase.from("profiles").select("*").order("nome"),
-          supabase.from("user_roles").select("*"),
-          supabase.from("regras_escalonamento").select("*").order("evento").order("nivel"),
-          supabase.from("notificacoes").select("*").order("enviado_em", { ascending: false }).limit(100),
-          supabase.from("auditoria").select("*").order("created_at", { ascending: false }).limit(100),
-        ]);
+      const [
+        { data: perfis },
+        { data: papeis },
+        { data: regras },
+        { data: notifs },
+        { data: aud },
+        { data: integ },
+      ] = await Promise.all([
+        supabase.from("profiles").select("*").order("nome"),
+        supabase.from("user_roles").select("*"),
+        supabase.from("regras_escalonamento").select("*").order("evento").order("nivel"),
+        supabase.from("notificacoes").select("*").order("enviado_em", { ascending: false }).limit(100),
+        supabase.from("auditoria").select("*").order("created_at", { ascending: false }).limit(100),
+        supabase.from("integracoes_config").select("*").eq("chave", "invgate_base_url").maybeSingle(),
+      ]);
       return {
         perfis: perfis ?? [],
         papeis: papeis ?? [],
         regras: regras ?? [],
         notifs: notifs ?? [],
         auditoria: aud ?? [],
+        integracoes: integ ?? null,
       };
     },
   });
 
   const perfis = data?.perfis ?? [];
   const papeis = data?.papeis ?? [];
+
+  useEffect(() => {
+    if (data?.integracoes) setBaseUrl(data.integracoes.valor);
+  }, [data?.integracoes]);
+
+  async function salvarIntegracao() {
+    const valor = baseUrl.trim().replace(/\/+$/, "");
+    if (!valor) {
+      toast.error("Informe a URL base do InvGate.");
+      return;
+    }
+    const { error } = await supabase
+      .from("integracoes_config")
+      .update({ valor })
+      .eq("chave", "invgate_base_url");
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    await registrarAuditoria("atualizar_integracao", "integracoes_config", null, {
+      chave: "invgate_base_url",
+    });
+    toast.success("Integração atualizada");
+    qc.invalidateQueries({ queryKey: ["admin"] });
+  }
 
   async function definirPapel(userId: string, role: AppRole) {
     const atuais = papeis.filter((p) => p.user_id === userId);
