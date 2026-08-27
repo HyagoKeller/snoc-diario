@@ -137,6 +137,7 @@ function Admin() {
           <TabsTrigger value="regras">Notificações</TabsTrigger>
           <TabsTrigger value="disparos">Disparos</TabsTrigger>
           <TabsTrigger value="auditoria">Auditoria</TabsTrigger>
+          <TabsTrigger value="integracoes">Integrações</TabsTrigger>
         </TabsList>
 
         <TabsContent value="usuarios" className="pt-4">
