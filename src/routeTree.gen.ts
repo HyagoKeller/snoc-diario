@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as FaqRouteImport } from './routes/faq'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedPainelRouteImport } from './routes/_authenticated/painel'
 import { Route as AuthenticatedPassagensRouteImport } from './routes/_authenticated/passagens'
@@ -35,6 +36,11 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
@@ -94,6 +100,7 @@ const AuthenticatedRondasNovaRoute = AuthenticatedRondasNovaRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/faq': typeof FaqRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/painel': typeof AuthenticatedPainelRoute
   '/passagens': typeof AuthenticatedPassagensRoute
@@ -108,6 +115,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/faq': typeof FaqRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/painel': typeof AuthenticatedPainelRoute
   '/passagens': typeof AuthenticatedPassagensRoute
@@ -124,6 +132,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/faq': typeof FaqRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/painel': typeof AuthenticatedPainelRoute
   '/_authenticated/passagens': typeof AuthenticatedPassagensRoute
@@ -140,6 +149,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/faq'
     | '/admin'
     | '/painel'
     | '/passagens'
@@ -154,6 +164,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/faq'
     | '/admin'
     | '/painel'
     | '/passagens'
@@ -169,6 +180,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/faq'
     | '/_authenticated/admin'
     | '/_authenticated/painel'
     | '/_authenticated/passagens'
@@ -185,6 +197,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  FaqRoute: typeof FaqRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -208,6 +221,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin': {
@@ -316,6 +336,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  FaqRoute: FaqRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
