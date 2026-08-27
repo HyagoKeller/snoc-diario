@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Plus, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -44,30 +44,64 @@ function Admin() {
   const [prazo, setPrazo] = useState("15");
   const [nivel, setNivel] = useState("1");
   const [destinatarios, setDestinatarios] = useState("");
+  const [baseUrl, setBaseUrl] = useState("");
 
   const { data } = useQuery({
     queryKey: ["admin"],
     queryFn: async () => {
-      const [{ data: perfis }, { data: papeis }, { data: regras }, { data: notifs }, { data: aud }] =
-        await Promise.all([
-          supabase.from("profiles").select("*").order("nome"),
-          supabase.from("user_roles").select("*"),
-          supabase.from("regras_escalonamento").select("*").order("evento").order("nivel"),
-          supabase.from("notificacoes").select("*").order("enviado_em", { ascending: false }).limit(100),
-          supabase.from("auditoria").select("*").order("created_at", { ascending: false }).limit(100),
-        ]);
+      const [
+        { data: perfis },
+        { data: papeis },
+        { data: regras },
+        { data: notifs },
+        { data: aud },
+        { data: integ },
+      ] = await Promise.all([
+        supabase.from("profiles").select("*").order("nome"),
+        supabase.from("user_roles").select("*"),
+        supabase.from("regras_escalonamento").select("*").order("evento").order("nivel"),
+        supabase.from("notificacoes").select("*").order("enviado_em", { ascending: false }).limit(100),
+        supabase.from("auditoria").select("*").order("created_at", { ascending: false }).limit(100),
+        supabase.from("integracoes_config").select("*").eq("chave", "invgate_base_url").maybeSingle(),
+      ]);
       return {
         perfis: perfis ?? [],
         papeis: papeis ?? [],
         regras: regras ?? [],
         notifs: notifs ?? [],
         auditoria: aud ?? [],
+        integracoes: integ ?? null,
       };
     },
   });
 
   const perfis = data?.perfis ?? [];
   const papeis = data?.papeis ?? [];
+
+  useEffect(() => {
+    if (data?.integracoes) setBaseUrl(data.integracoes.valor);
+  }, [data?.integracoes]);
+
+  async function salvarIntegracao() {
+    const valor = baseUrl.trim().replace(/\/+$/, "");
+    if (!valor) {
+      toast.error("Informe a URL base do InvGate.");
+      return;
+    }
+    const { error } = await supabase
+      .from("integracoes_config")
+      .update({ valor })
+      .eq("chave", "invgate_base_url");
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    await registrarAuditoria("atualizar_integracao", "integracoes_config", null, {
+      chave: "invgate_base_url",
+    });
+    toast.success("Integração atualizada");
+    qc.invalidateQueries({ queryKey: ["admin"] });
+  }
 
   async function definirPapel(userId: string, role: AppRole) {
     const atuais = papeis.filter((p) => p.user_id === userId);
@@ -137,6 +171,7 @@ function Admin() {
           <TabsTrigger value="regras">Notificações</TabsTrigger>
           <TabsTrigger value="disparos">Disparos</TabsTrigger>
           <TabsTrigger value="auditoria">Auditoria</TabsTrigger>
+          <TabsTrigger value="integracoes">Integrações</TabsTrigger>
         </TabsList>
 
         <TabsContent value="usuarios" className="pt-4">
@@ -284,6 +319,30 @@ function Admin() {
               <p className="p-6 text-sm text-muted-foreground">Sem registros de auditoria.</p>
             ) : null}
           </div>
+        </TabsContent>
+
+        <TabsContent value="integracoes" className="space-y-4 pt-4">
+          <section className="panel space-y-4 p-5">
+            <h2 className="text-base font-semibold">InvGate (Service Desk / ITSM)</h2>
+            <p className="text-sm text-muted-foreground">
+              A URL base é usada para consultar e abrir chamados vinculados a rondas e ordens de
+              serviço. O token de API fica guardado como segredo do servidor e nunca aparece aqui.
+            </p>
+            <div className="grid gap-4 sm:grid-cols-[1fr_auto] sm:items-end">
+              <div className="space-y-2">
+                <Label>URL base do InvGate</Label>
+                <Input
+                  value={baseUrl}
+                  onChange={(e) => setBaseUrl(e.target.value)}
+                  placeholder="https://agu.sd.cloud.invgate.net"
+                />
+              </div>
+              <Button onClick={salvarIntegracao}>Salvar</Button>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Atualizado {fmtDateTime(data?.integracoes?.updated_at)}.
+            </p>
+          </section>
         </TabsContent>
       </Tabs>
     </div>

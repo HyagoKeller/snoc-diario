@@ -6,6 +6,7 @@ import { signedUrl } from "@/lib/storage";
 import { CRITICIDADE_LABEL, STATUS_LABEL, criticidadeToken, fmtDate } from "@/lib/snoc";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { ChamadoItsmCard } from "@/components/ChamadoItsmField";
 
 export const Route = createFileRoute("/_authenticated/rondas/$id")({
   head: () => ({
@@ -35,7 +36,16 @@ function DetalheRonda() {
           url: i.foto_url ? await signedUrl(i.foto_url) : null,
         })),
       );
-      return { ronda, itens: comUrl };
+      let anterior = null;
+      if (ronda?.ronda_anterior_id) {
+        const { data: ant } = await supabase
+          .from("rondas")
+          .select("id,data,turno,total_nc,temperatura,umidade")
+          .eq("id", ronda.ronda_anterior_id)
+          .maybeSingle();
+        anterior = ant;
+      }
+      return { ronda, itens: comUrl, anterior };
     },
   });
 
@@ -72,6 +82,26 @@ function DetalheRonda() {
         </div>
         {ronda.observacoes ? (
           <p className="mt-4 text-sm text-muted-foreground">{ronda.observacoes}</p>
+        ) : null}
+        {ronda.chamado_itsm ? (
+          <div className="mt-4">
+            <ChamadoItsmCard numero={ronda.chamado_itsm} cache={ronda.chamado_itsm_cache} />
+          </div>
+        ) : null}
+        {data?.anterior ? (
+          <div className="mt-4 rounded-md border border-border p-3 text-sm">
+            <p className="label-mono">Comparação com a ronda anterior</p>
+            <p className="mt-1 text-muted-foreground">
+              {fmtDate(data.anterior.data)} · {data.anterior.turno}: {data.anterior.total_nc} NC →
+              agora {ronda.total_nc} NC (
+              {ronda.total_nc === data.anterior.total_nc
+                ? "estável"
+                : ronda.total_nc > data.anterior.total_nc
+                  ? `piora de ${ronda.total_nc - data.anterior.total_nc}`
+                  : `melhora de ${data.anterior.total_nc - ronda.total_nc}`}
+              )
+            </p>
+          </div>
         ) : null}
       </header>
 

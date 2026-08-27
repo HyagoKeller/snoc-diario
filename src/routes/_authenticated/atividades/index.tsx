@@ -20,6 +20,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ChamadoItsmField } from "@/components/ChamadoItsmField";
+import type { ChamadoItsm } from "@/lib/invgate.functions";
 
 export const Route = createFileRoute("/_authenticated/atividades/")({
   head: () => ({
@@ -52,6 +54,11 @@ function Atividades() {
   const [inicio, setInicio] = useState("");
   const [fim, setFim] = useState("");
   const [busy, setBusy] = useState(false);
+  const [chamado, setChamado] = useState("");
+  const [chamadoCache, setChamadoCache] = useState<ChamadoItsm | null>(null);
+  const [osFornecedor, setOsFornecedor] = useState("");
+  const [custo, setCusto] = useState("");
+  const [garantia, setGarantia] = useState("");
 
   const { data } = useQuery({
     queryKey: ["atividades"],
@@ -88,6 +95,11 @@ function Atividades() {
           janela_fim: fim ? new Date(fim).toISOString() : null,
           aberta_por: user.id,
           status: inicio ? "agendada" : "aberta",
+          chamado_itsm: chamado.trim() || null,
+          chamado_itsm_cache: chamadoCache ? (chamadoCache as never) : null,
+          numero_os_fornecedor: osFornecedor.trim() || null,
+          custo: custo ? Number(custo) : null,
+          garantia_ate: garantia || null,
         })
         .select()
         .single();
@@ -125,6 +137,11 @@ O acesso físico exige check-in no SNOC vinculado a esta OS, com evidência foto
       setTitulo("");
       setDescricao("");
       setAtivo("");
+      setChamado("");
+      setChamadoCache(null);
+      setOsFornecedor("");
+      setCusto("");
+      setGarantia("");
       qc.invalidateQueries({ queryKey: ["atividades"] });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Falha ao abrir a OS");
@@ -217,7 +234,36 @@ O acesso físico exige check-in no SNOC vinculado a esta OS, com evidência foto
               <Label>Janela — fim</Label>
               <Input type="datetime-local" value={fim} onChange={(e) => setFim(e.target.value)} />
             </div>
+            <div className="space-y-2">
+              <Label>Nº da OS do fornecedor</Label>
+              <Input
+                value={osFornecedor}
+                onChange={(e) => setOsFornecedor(e.target.value)}
+                placeholder="OS-2026-1187"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Custo estimado (R$)</Label>
+              <Input
+                type="number"
+                step="0.01"
+                min={0}
+                value={custo}
+                onChange={(e) => setCusto(e.target.value)}
+                placeholder="0,00"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Garantia da peça até</Label>
+              <Input type="date" value={garantia} onChange={(e) => setGarantia(e.target.value)} />
+            </div>
           </div>
+          <ChamadoItsmField
+            numero={chamado}
+            onNumero={setChamado}
+            cache={chamadoCache}
+            onCache={setChamadoCache}
+          />
           <div className="space-y-2">
             <Label>Descrição do serviço</Label>
             <Textarea value={descricao} onChange={(e) => setDescricao(e.target.value)} />
@@ -245,6 +291,8 @@ O acesso físico exige check-in no SNOC vinculado a esta OS, com evidência foto
                 <p className="text-xs text-muted-foreground">
                   {ATIVIDADE_TIPO_LABEL[a.tipo]} · {a.ativo_afetado || "sem ativo"} · aberta{" "}
                   {fmtDateTime(a.aberta_em)}
+                  {a.chamado_itsm ? ` · chamado ${a.chamado_itsm}` : ""}
+                  {a.numero_os_fornecedor ? ` · OS fornecedor ${a.numero_os_fornecedor}` : ""}
                 </p>
               </div>
               <div className="flex items-center gap-2">

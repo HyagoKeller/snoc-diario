@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export const Route = createFileRoute("/_authenticated/passagens")({
@@ -42,6 +43,9 @@ function Passagens() {
   const [incidentes, setIncidentes] = useState("");
   const [mudancas, setMudancas] = useState("");
   const [pendencias, setPendencias] = useState<Pendencia[]>([]);
+  const [tier0, setTier0] = useState("");
+  const [conting, setConting] = useState(false);
+  const [contingDesc, setContingDesc] = useState("");
   const [busy, setBusy] = useState(false);
 
   const { data } = useQuery({
@@ -73,6 +77,9 @@ function Passagens() {
           status_sistemas: statusSistemas || null,
           incidentes_ativos: incidentes || null,
           mudancas_realizadas: mudancas || null,
+          status_servicos_tier0: tier0 || null,
+          contingencia_ativa: conting,
+          contingencia_descricao: conting ? contingDesc || null : null,
           prazo_aceite: prazo,
         })
         .select()
@@ -97,6 +104,9 @@ function Passagens() {
       setStatusSistemas("");
       setIncidentes("");
       setMudancas("");
+      setTier0("");
+      setConting(false);
+      setContingDesc("");
       qc.invalidateQueries({ queryKey: ["passagens"] });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Falha ao registrar passagem");
@@ -212,6 +222,27 @@ function Passagens() {
             <Label>Mudanças realizadas no turno</Label>
             <Textarea value={mudancas} onChange={(e) => setMudancas(e.target.value)} />
           </div>
+          <div className="space-y-2">
+            <Label>Status dos serviços Tier 0 (críticos indisponíveis afetam a Advocacia)</Label>
+            <Textarea
+              value={tier0}
+              onChange={(e) => setTier0(e.target.value)}
+              placeholder="Sapiens: normal · e-AGU: normal · SEI: degradado"
+            />
+          </div>
+          <label className="flex items-start gap-3 rounded-md border border-border p-3 text-sm">
+            <Checkbox checked={conting} onCheckedChange={(v) => setConting(v === true)} />
+            <span className="text-muted-foreground">
+              Turno encerrado com plano de contingência ativo (link redundante, gerador, bypass,
+              operação manual).
+            </span>
+          </label>
+          {conting ? (
+            <div className="space-y-2">
+              <Label>Descrição da contingência ativa</Label>
+              <Textarea value={contingDesc} onChange={(e) => setContingDesc(e.target.value)} />
+            </div>
+          ) : null}
 
           <div className="space-y-3">
             <div className="flex items-center justify-between">
@@ -335,10 +366,25 @@ function Passagens() {
                 </div>
               </div>
 
-              <dl className="mt-4 grid gap-4 text-sm sm:grid-cols-3">
+              {p.contingencia_ativa ? (
+                <div className="mt-4 rounded-md border border-critico/50 bg-critico/10 p-3 text-sm">
+                  <p className="flex items-center gap-2 font-semibold text-critico">
+                    <AlertTriangle className="size-4" /> Contingência ativa
+                  </p>
+                  <p className="mt-1 text-muted-foreground">
+                    {p.contingencia_descricao || "Sem descrição registrada."}
+                  </p>
+                </div>
+              ) : null}
+
+              <dl className="mt-4 grid gap-4 text-sm sm:grid-cols-2 lg:grid-cols-4">
                 <div>
                   <dt className="label-mono">Sistemas</dt>
                   <dd className="mt-1 text-muted-foreground">{p.status_sistemas || "—"}</dd>
+                </div>
+                <div>
+                  <dt className="label-mono">Serviços Tier 0</dt>
+                  <dd className="mt-1 text-muted-foreground">{p.status_servicos_tier0 || "—"}</dd>
                 </div>
                 <div>
                   <dt className="label-mono">Incidentes ativos</dt>
