@@ -1,135 +1,106 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Activity, ClipboardCheck, Repeat2, ShieldCheck, Wrench, LogIn } from "lucide-react";
+import { Activity, LogIn, Lock, HelpCircle } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "SNOC OPS | Rondas, Turnos, Acesso e OS do Data Center" },
+      { title: "SNOC OPS | Acesso institucional — DTI-AGU" },
       {
         name: "description",
         content:
-          "SNOC OPS unifica rondas operacionais com evidência fotográfica, passagem de turno com escalonamento, controle de acesso de terceiros e ordens de serviço.",
+          "Ambiente institucional de operação do Data Center da AGU: rondas, passagem de turno, acesso de terceiros e ordens de serviço. Acesso restrito à equipe do SNOC.",
       },
-      { property: "og:title", content: "SNOC OPS — operação unificada do Data Center" },
+      { property: "og:title", content: "SNOC OPS — acesso institucional" },
       {
         property: "og:description",
-        content:
-          "Rondas digitais, passagem de turno com prazo, acesso de terceiros e OS com evidência antes/depois.",
+        content: "Sistema interno de operação do Data Center. Acesso restrito e monitorado.",
       },
     ],
   }),
   component: Landing,
 });
 
-const MODULOS = [
-  {
-    icon: ClipboardCheck,
-    titulo: "Rondas operacionais",
-    texto:
-      "Checklist digital por seção com C/NC/NA, foto obrigatória em não conformidade e resumo calculado pelo sistema.",
-  },
-  {
-    icon: Repeat2,
-    titulo: "Passagem de turno",
-    texto:
-      "Aceite com prazo. Sem confirmação no tempo definido, o escalonamento sai automaticamente para a chefia configurada.",
-  },
-  {
-    icon: ShieldCheck,
-    titulo: "Acesso de terceiros",
-    texto:
-      "Check-in amarrado a uma OS, foto de documento, acompanhante interno e alerta de check-out em atraso.",
-  },
-  {
-    icon: Wrench,
-    titulo: "Atividades e OS",
-    texto:
-      "Abertura, aviso ao fornecedor, evidência antes/depois, laudo anexado e fechamento rastreável.",
-  },
+const INDICADORES = [
+  { valor: "6 seções", texto: "Checklist oficial de ronda" },
+  { valor: "15 min", texto: "Prazo de aceite do turno" },
+  { valor: "5 anos", texto: "Retenção de evidências" },
 ];
 
 function Landing() {
   const { session } = useAuth();
 
   return (
-    <main className="min-h-screen">
-      <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
-        <div className="flex items-center gap-3">
-          <div className="flex size-10 items-center justify-center rounded-md bg-primary/15 text-primary">
-            <Activity className="size-5" />
-          </div>
-          <div>
-            <p className="font-display text-lg leading-none font-bold">SNOC OPS</p>
-            <p className="label-mono">DTI-AGU · Network Operations Center</p>
-          </div>
-        </div>
-        <Button asChild>
-          <Link to={session ? "/painel" : "/auth"}>
-            <LogIn className="size-4" />
-            {session ? "Abrir painel" : "Entrar"}
+    <main className="flex min-h-screen flex-col">
+      <div className="faixa-gov" />
+
+      <header className="border-b border-border">
+        <div className="mx-auto grid max-w-5xl grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-6 py-4">
+          <p className="label-mono truncate">Advocacia-Geral da União · DTI</p>
+          <Link
+            to="/faq"
+            className="flex shrink-0 items-center gap-2 text-xs text-muted-foreground transition-colors hover:text-foreground"
+          >
+            <HelpCircle className="size-4" /> Dúvidas / FAQ
           </Link>
-        </Button>
+        </div>
       </header>
 
-      <section className="mx-auto max-w-6xl px-6 pt-10 pb-16">
-        <p className="label-mono">Plataforma operacional unificada</p>
-        <h1 className="mt-3 max-w-3xl text-4xl leading-tight font-bold sm:text-5xl">
-          Uma única plataforma para <span className="text-primary">rondas</span>, passagem de turno,
-          acesso de terceiros e ordens de serviço.
+      <section className="mx-auto flex w-full max-w-5xl flex-1 flex-col items-center px-6 py-14 text-center">
+        <div className="flex size-14 items-center justify-center rounded-md bg-primary/15 text-primary">
+          <Activity className="size-7" />
+        </div>
+
+        <p className="label-mono mt-6">Secretaria-Geral de Administração · DTI</p>
+        <p className="label-mono">Serviço de Network Operations Center — SNOC</p>
+
+        <h1 className="mt-4 text-4xl font-bold sm:text-5xl">
+          SNOC <span className="text-primary">OPS</span>
         </h1>
-        <p className="mt-5 max-w-2xl text-base text-muted-foreground">
-          Os formulários em papel e PDF do SNOC passam a ser registro digital com evidência
-          fotográfica, prazo de aceite, escalonamento automático e histórico auditável do Data
-          Center.
+        <p className="mt-4 max-w-xl text-sm text-muted-foreground sm:text-base">
+          Registro operacional do Data Center: rondas, passagem de turno, acesso de terceiros e
+          ordens de serviço.
         </p>
-        <div className="mt-8 flex flex-wrap gap-3">
-          <Button asChild size="lg">
-            <Link to={session ? "/painel" : "/auth"}>
-              {session ? "Ir para o painel" : "Acessar o sistema"}
-            </Link>
-          </Button>
-        </div>
 
-        <div className="mt-16 grid gap-4 sm:grid-cols-2">
-          {MODULOS.map((m) => (
-            <article key={m.titulo} className="panel p-6">
-              <m.icon className="size-5 text-primary" />
-              <h2 className="mt-4 text-lg font-semibold">{m.titulo}</h2>
-              <p className="mt-2 text-sm text-muted-foreground">{m.texto}</p>
-            </article>
+        <dl className="mt-10 grid w-full max-w-2xl gap-3 sm:grid-cols-3">
+          {INDICADORES.map((i) => (
+            <div key={i.valor} className="panel px-4 py-4">
+              <dt className="font-display text-base font-bold">{i.valor}</dt>
+              <dd className="mt-1 text-xs text-muted-foreground">{i.texto}</dd>
+            </div>
           ))}
-        </div>
+        </dl>
 
-        <div className="panel mt-4 p-6">
-          <h2 className="text-lg font-semibold">Cada papel, uma visão do mesmo dado</h2>
-          <div className="mt-4 grid gap-6 sm:grid-cols-3">
-            <div>
-              <p className="label-mono">Operador SNOC</p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Fila do turno: rondas pendentes, aceite de passagem, terceiros em campo e suas OS.
-              </p>
-            </div>
-            <div>
-              <p className="label-mono">Gestor AGU</p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Indicadores consolidados: NC por criticidade, SLA de aceite, tendência de
-                temperatura e relatórios mensais.
-              </p>
-            </div>
-            <div>
-              <p className="label-mono">Super Admin</p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Papéis, regras de escalonamento, destinatários de relatório e log de auditoria.
-              </p>
-            </div>
+        <div className="panel mt-10 w-full max-w-sm overflow-hidden text-left">
+          <div className="faixa-gov" />
+          <div className="space-y-3 p-5">
+            <p className="text-sm font-semibold">Acesso institucional</p>
+            <p className="text-xs text-muted-foreground">
+              Perfil atribuído pela chefia do SNOC. Utilize seu e-mail @agu.gov.br.
+            </p>
+            <Button asChild className="w-full">
+              <Link to={session ? "/painel" : "/auth"}>
+                <LogIn className="size-4" />
+                {session ? "Abrir painel" : "Entrar"}
+              </Link>
+            </Button>
+            <Link
+              to="/faq"
+              className="block text-center text-xs text-muted-foreground underline-offset-4 hover:underline"
+            >
+              O que este sistema registra?
+            </Link>
           </div>
         </div>
+
+        <p className="mt-6 flex items-center gap-2 text-xs text-muted-foreground">
+          <Lock className="size-3.5" /> Acesso restrito e registrado em trilha de auditoria.
+        </p>
       </section>
 
       <footer className="border-t border-border py-6">
-        <p className="mx-auto max-w-6xl px-6 text-xs text-muted-foreground">
+        <p className="mx-auto max-w-5xl px-6 text-xs text-muted-foreground">
           SNOC OPS · DTI-AGU. Dados pessoais de terceiros tratados conforme a LGPD, com
           consentimento registrado no check-in.
         </p>

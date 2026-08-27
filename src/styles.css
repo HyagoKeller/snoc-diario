@@ -170,3 +170,15 @@
   text-transform: uppercase;
   color: var(--color-muted-foreground);
 }
+
+/* Faixa institucional gov.br: verde, amarelo e azul. */
+@utility faixa-gov {
+  height: 4px;
+  width: 100%;
+  background: linear-gradient(
+    to right,
+    oklch(0.55 0.14 155) 0 33.33%,
+    oklch(0.84 0.16 92) 33.33% 66.66%,
+    oklch(0.45 0.17 265) 66.66% 100%
+  );
+}
