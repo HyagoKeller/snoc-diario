@@ -12,8 +12,10 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedPainelRouteImport } from './routes/_authenticated/painel'
 import { Route as AuthenticatedPassagensRouteImport } from './routes/_authenticated/passagens'
+import { Route as AuthenticatedRelatoriosRouteImport } from './routes/_authenticated/relatorios'
 import { Route as AuthenticatedTerceirosRouteImport } from './routes/_authenticated/terceiros'
 import { Route as AuthenticatedAtividadesIndexRouteImport } from './routes/_authenticated/atividades/index'
 import { Route as AuthenticatedAtividadesIdRouteImport } from './routes/_authenticated/atividades/$id'
@@ -35,6 +37,11 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedPainelRoute = AuthenticatedPainelRouteImport.update({
   id: '/painel',
   path: '/painel',
@@ -43,6 +50,11 @@ const AuthenticatedPainelRoute = AuthenticatedPainelRouteImport.update({
 const AuthenticatedPassagensRoute = AuthenticatedPassagensRouteImport.update({
   id: '/passagens',
   path: '/passagens',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedRelatoriosRoute = AuthenticatedRelatoriosRouteImport.update({
+  id: '/relatorios',
+  path: '/relatorios',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedTerceirosRoute = AuthenticatedTerceirosRouteImport.update({
@@ -82,8 +94,10 @@ const AuthenticatedRondasNovaRoute = AuthenticatedRondasNovaRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/painel': typeof AuthenticatedPainelRoute
   '/passagens': typeof AuthenticatedPassagensRoute
+  '/relatorios': typeof AuthenticatedRelatoriosRoute
   '/terceiros': typeof AuthenticatedTerceirosRoute
   '/atividades/$id': typeof AuthenticatedAtividadesIdRoute
   '/rondas/$id': typeof AuthenticatedRondasIdRoute
@@ -94,8 +108,10 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/painel': typeof AuthenticatedPainelRoute
   '/passagens': typeof AuthenticatedPassagensRoute
+  '/relatorios': typeof AuthenticatedRelatoriosRoute
   '/terceiros': typeof AuthenticatedTerceirosRoute
   '/atividades/$id': typeof AuthenticatedAtividadesIdRoute
   '/rondas/$id': typeof AuthenticatedRondasIdRoute
@@ -108,8 +124,10 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/painel': typeof AuthenticatedPainelRoute
   '/_authenticated/passagens': typeof AuthenticatedPassagensRoute
+  '/_authenticated/relatorios': typeof AuthenticatedRelatoriosRoute
   '/_authenticated/terceiros': typeof AuthenticatedTerceirosRoute
   '/_authenticated/atividades/$id': typeof AuthenticatedAtividadesIdRoute
   '/_authenticated/rondas/$id': typeof AuthenticatedRondasIdRoute
@@ -122,8 +140,10 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/admin'
     | '/painel'
     | '/passagens'
+    | '/relatorios'
     | '/terceiros'
     | '/atividades/$id'
     | '/rondas/$id'
@@ -134,8 +154,10 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/admin'
     | '/painel'
     | '/passagens'
+    | '/relatorios'
     | '/terceiros'
     | '/atividades/$id'
     | '/rondas/$id'
@@ -147,8 +169,10 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/_authenticated/admin'
     | '/_authenticated/painel'
     | '/_authenticated/passagens'
+    | '/_authenticated/relatorios'
     | '/_authenticated/terceiros'
     | '/_authenticated/atividades/$id'
     | '/_authenticated/rondas/$id'
@@ -186,6 +210,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/painel': {
       id: '/_authenticated/painel'
       path: '/painel'
@@ -198,6 +229,13 @@ declare module '@tanstack/react-router' {
       path: '/passagens'
       fullPath: '/passagens'
       preLoaderRoute: typeof AuthenticatedPassagensRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/relatorios': {
+      id: '/_authenticated/relatorios'
+      path: '/relatorios'
+      fullPath: '/relatorios'
+      preLoaderRoute: typeof AuthenticatedRelatoriosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/terceiros': {
@@ -246,8 +284,10 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedPainelRoute: typeof AuthenticatedPainelRoute
   AuthenticatedPassagensRoute: typeof AuthenticatedPassagensRoute
+  AuthenticatedRelatoriosRoute: typeof AuthenticatedRelatoriosRoute
   AuthenticatedTerceirosRoute: typeof AuthenticatedTerceirosRoute
   AuthenticatedAtividadesIdRoute: typeof AuthenticatedAtividadesIdRoute
   AuthenticatedRondasIdRoute: typeof AuthenticatedRondasIdRoute
@@ -257,8 +297,10 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedPainelRoute: AuthenticatedPainelRoute,
   AuthenticatedPassagensRoute: AuthenticatedPassagensRoute,
+  AuthenticatedRelatoriosRoute: AuthenticatedRelatoriosRoute,
   AuthenticatedTerceirosRoute: AuthenticatedTerceirosRoute,
   AuthenticatedAtividadesIdRoute: AuthenticatedAtividadesIdRoute,
   AuthenticatedRondasIdRoute: AuthenticatedRondasIdRoute,
