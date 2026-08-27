@@ -139,6 +139,7 @@ function Painel() {
     (r) => r.data === new Date().toISOString().slice(0, 10) && r.turno === turnoAtual(),
   );
   const pendentesAceite = passagens.filter((p) => p.status_aceite === "pendente");
+  const contingencia = passagens.find((p) => p.contingencia_ativa);
 
   return (
     <div className="space-y-6">
