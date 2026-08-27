@@ -2,8 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import { FileText, RefreshCw } from "lucide-react";
+import { Download, FileText, RefreshCw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { gerarPdfConsolidado } from "@/lib/pdf";
 import { useAuth } from "@/hooks/useAuth";
 import { registrarAuditoria } from "@/lib/notificacoes";
 import { CRITICIDADE_LABEL, fmtDateTime, periodoRefAnterior } from "@/lib/snoc";
@@ -202,7 +203,18 @@ function Relatorios() {
                     </p>
                   </div>
                 </div>
-                <Badge variant="outline">{r.tipo}</Badge>
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline">{r.tipo}</Badge>
+                  {c ? (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => gerarPdfConsolidado(r.periodo_referencia, c, r.gerado_em)}
+                    >
+                      <Download className="size-4" /> PDF
+                    </Button>
+                  ) : null}
+                </div>
               </div>
 
               {c ? (
