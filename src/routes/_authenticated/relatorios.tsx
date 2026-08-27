@@ -202,7 +202,18 @@ function Relatorios() {
                     </p>
                   </div>
                 </div>
-                <Badge variant="outline">{r.tipo}</Badge>
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline">{r.tipo}</Badge>
+                  {c ? (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => gerarPdfConsolidado(r.periodo_referencia, c, r.gerado_em)}
+                    >
+                      <Download className="size-4" /> PDF
+                    </Button>
+                  ) : null}
+                </div>
               </div>
 
               {c ? (
