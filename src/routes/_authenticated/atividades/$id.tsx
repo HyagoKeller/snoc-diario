@@ -18,6 +18,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ChamadoItsmCard } from "@/components/ChamadoItsmField";
+import { fmtDate } from "@/lib/snoc";
 
 export const Route = createFileRoute("/_authenticated/atividades/$id")({
   head: () => ({
@@ -39,6 +41,7 @@ function DetalheOS() {
   const qc = useQueryClient();
   const [tipoEvid, setTipoEvid] = useState<EvidTipo>("antes");
   const [arquivo, setArquivo] = useState<File | undefined>();
+  const [nota, setNota] = useState<File | undefined>();
   const [busy, setBusy] = useState(false);
 
   const { data } = useQuery({
@@ -61,12 +64,41 @@ function DetalheOS() {
           .maybeSingle();
         fornecedor = f;
       }
-      return { atividade, evidencias: comUrl, visitas: visitas ?? [], fornecedor };
+      const notaUrl = atividade?.nota_fiscal_url
+        ? await signedUrl(atividade.nota_fiscal_url)
+        : null;
+      return { atividade, evidencias: comUrl, visitas: visitas ?? [], fornecedor, notaUrl };
     },
   });
 
   const a = data?.atividade;
   const evidencias = data?.evidencias ?? [];
+  const notaUrl = data?.notaUrl ?? null;
+
+  async function enviarNota() {
+    if (!nota) {
+      toast.error("Selecione o arquivo da nota fiscal.");
+      return;
+    }
+    setBusy(true);
+    try {
+      const path = await uploadEvidencia(nota, `atividades/${id}/nf`);
+      const { error } = await supabase
+        .from("atividades")
+        .update({ nota_fiscal_url: path })
+        .eq("id", id);
+      if (error) throw error;
+      await registrarAuditoria("anexar_nota_fiscal", "atividades", id);
+      setNota(undefined);
+      toast.success("Nota fiscal anexada");
+      qc.invalidateQueries({ queryKey: ["atividade", id] });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Falha ao anexar nota fiscal");
+    } finally {
+      setBusy(false);
+    }
+  }
+
 
   async function enviar() {
     if (!user || !arquivo) {
@@ -162,9 +194,62 @@ function DetalheOS() {
             <dt className="label-mono">Fechamento</dt>
             <dd className="mt-1 text-muted-foreground">{fmtDateTime(a.fechada_em)}</dd>
           </div>
+          <div>
+            <dt className="label-mono">Nº OS do fornecedor</dt>
+            <dd className="mt-1 text-muted-foreground">{a.numero_os_fornecedor || "—"}</dd>
+          </div>
+          <div>
+            <dt className="label-mono">Custo</dt>
+            <dd className="mt-1 text-muted-foreground">
+              {a.custo != null
+                ? Number(a.custo).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
+                : "—"}
+            </dd>
+          </div>
+          <div>
+            <dt className="label-mono">Garantia até</dt>
+            <dd className="mt-1 text-muted-foreground">
+              {a.garantia_ate ? fmtDate(a.garantia_ate) : "—"}
+            </dd>
+          </div>
+          <div>
+            <dt className="label-mono">Nota fiscal</dt>
+            <dd className="mt-1 text-muted-foreground">
+              {notaUrl ? (
+                <a href={notaUrl} target="_blank" rel="noreferrer" className="text-primary underline">
+                  Abrir arquivo
+                </a>
+              ) : (
+                "não anexada"
+              )}
+            </dd>
+          </div>
         </dl>
+        {a.chamado_itsm ? (
+          <div className="mt-4">
+            <ChamadoItsmCard numero={a.chamado_itsm} cache={a.chamado_itsm_cache} />
+          </div>
+        ) : null}
         {a.descricao ? <p className="mt-4 text-sm text-muted-foreground">{a.descricao}</p> : null}
       </header>
+
+      <section className="panel space-y-3 p-5">
+        <h2 className="text-base font-semibold">Nota fiscal / documento financeiro</h2>
+        <div className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
+          <div className="space-y-2">
+            <Label htmlFor="nf">Arquivo (imagem ou PDF)</Label>
+            <Input
+              id="nf"
+              type="file"
+              accept="image/*,application/pdf"
+              onChange={(e) => setNota(e.target.files?.[0])}
+            />
+          </div>
+          <Button variant="outline" onClick={enviarNota} disabled={busy}>
+            <Upload className="size-4" /> Anexar nota
+          </Button>
+        </div>
+      </section>
 
       <section className="panel space-y-4 p-5">
         <h2 className="text-base font-semibold">Evidências</h2>

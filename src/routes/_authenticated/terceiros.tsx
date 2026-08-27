@@ -38,6 +38,9 @@ function Terceiros() {
 
   const [pessoa, setPessoa] = useState("");
   const [documento, setDocumento] = useState("");
+  const [tipoDoc, setTipoDoc] = useState("RG");
+  const [placa, setPlaca] = useState("");
+  const [motivo, setMotivo] = useState("");
   const [fornecedorId, setFornecedorId] = useState("");
   const [atividadeId, setAtividadeId] = useState("");
   const [zona, setZona] = useState("Sala de Servidores");
@@ -53,6 +56,10 @@ function Terceiros() {
   const [fDoc, setFDoc] = useState("");
   const [fValidade, setFValidade] = useState("");
   const [fTarefas, setFTarefas] = useState("");
+  const [fCnpj, setFCnpj] = useState("");
+  const [fApolice, setFApolice] = useState("");
+  const [fSeguroVal, setFSeguroVal] = useState("");
+  const [fAvaliacao, setFAvaliacao] = useState("");
 
   const { data } = useQuery({
     queryKey: ["terceiros"],
@@ -97,6 +104,9 @@ function Terceiros() {
         .insert({
           pessoa_nome: pessoa,
           documento: documento || null,
+          tipo_documento: tipoDoc,
+          placa_veiculo: placa.trim() || null,
+          motivo_visita: motivo.trim() || null,
           foto_documento_url: foto,
           fornecedor_id: fornecedorId || null,
           atividade_id: atividadeId || null,
@@ -116,6 +126,8 @@ function Terceiros() {
       toast.success("Check-in registrado");
       setPessoa("");
       setDocumento("");
+      setPlaca("");
+      setMotivo("");
       setFotoDoc(undefined);
       setConsent(false);
       qc.invalidateQueries({ queryKey: ["terceiros"] });
@@ -172,6 +184,10 @@ function Terceiros() {
       documento: fDoc || null,
       validade_credencial: fValidade || null,
       tarefas_autorizadas: fTarefas || null,
+      cnpj: fCnpj || null,
+      apolice_seguro: fApolice || null,
+      seguro_validade: fSeguroVal || null,
+      avaliacao_media: fAvaliacao ? Number(fAvaliacao) : null,
     });
     if (error) {
       toast.error(error.message);
@@ -184,6 +200,10 @@ function Terceiros() {
     setFDoc("");
     setFValidade("");
     setFTarefas("");
+    setFCnpj("");
+    setFApolice("");
+    setFSeguroVal("");
+    setFAvaliacao("");
     qc.invalidateQueries({ queryKey: ["terceiros"] });
   }
 
@@ -221,7 +241,10 @@ function Terceiros() {
                   <div>
                     <p className="font-semibold">{v.pessoa_nome}</p>
                     <p className="text-xs text-muted-foreground">
-                      {nomeForn(v.fornecedor_id)} · {v.zona} · doc. {v.documento || "—"}
+                      {nomeForn(v.fornecedor_id)} · {v.zona} · {v.tipo_documento || "doc."}{" "}
+                      {v.documento || "—"}
+                      {v.placa_veiculo ? ` · veículo ${v.placa_veiculo}` : ""}
+                      {v.motivo_visita ? ` · ${v.motivo_visita}` : ""}
                     </p>
                     <p className="mt-1 text-xs text-muted-foreground">
                       {osLabel(v.atividade_id)} · acompanhante {nomePerfil(v.acompanhante_id)}
@@ -269,8 +292,39 @@ function Terceiros() {
                 <Input value={pessoa} onChange={(e) => setPessoa(e.target.value)} />
               </div>
               <div className="space-y-2">
-                <Label>Documento</Label>
+                <Label>Tipo de documento</Label>
+                <Select value={tipoDoc} onValueChange={setTipoDoc}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {["RG", "CNH", "CPF", "Passaporte", "Crachá corporativo"].map((t) => (
+                      <SelectItem key={t} value={t}>
+                        {t}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>Número do documento</Label>
                 <Input value={documento} onChange={(e) => setDocumento(e.target.value)} />
+              </div>
+              <div className="space-y-2">
+                <Label>Placa do veículo</Label>
+                <Input
+                  value={placa}
+                  onChange={(e) => setPlaca(e.target.value.toUpperCase())}
+                  placeholder="ABC1D23"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Motivo da visita</Label>
+                <Input
+                  value={motivo}
+                  onChange={(e) => setMotivo(e.target.value)}
+                  placeholder="Troca preventiva de baterias"
+                />
               </div>
               <div className="space-y-2">
                 <Label>Fornecedor</Label>
@@ -374,6 +428,29 @@ function Terceiros() {
                 <Label>Validade da credencial</Label>
                 <Input type="date" value={fValidade} onChange={(e) => setFValidade(e.target.value)} />
               </div>
+              <div className="space-y-2">
+                <Label>CNPJ</Label>
+                <Input value={fCnpj} onChange={(e) => setFCnpj(e.target.value)} placeholder="00.000.000/0000-00" />
+              </div>
+              <div className="space-y-2">
+                <Label>Apólice de seguro</Label>
+                <Input value={fApolice} onChange={(e) => setFApolice(e.target.value)} />
+              </div>
+              <div className="space-y-2">
+                <Label>Validade do seguro</Label>
+                <Input type="date" value={fSeguroVal} onChange={(e) => setFSeguroVal(e.target.value)} />
+              </div>
+              <div className="space-y-2">
+                <Label>Avaliação média (0 a 5)</Label>
+                <Input
+                  type="number"
+                  step="0.1"
+                  min={0}
+                  max={5}
+                  value={fAvaliacao}
+                  onChange={(e) => setFAvaliacao(e.target.value)}
+                />
+              </div>
             </div>
             <div className="space-y-2">
               <Label>Tarefas autorizadas e evidência exigida</Label>
@@ -391,6 +468,19 @@ function Terceiros() {
                 <p className="text-xs text-muted-foreground">
                   {f.contato_nome || "—"} · {f.contato_email || "sem e-mail"} · credencial até{" "}
                   {f.validade_credencial ? fmtDate(f.validade_credencial) : "—"}
+                </p>
+                <p className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                  <span>CNPJ {f.cnpj || f.documento || "—"}</span>
+                  <span>
+                    · Apólice {f.apolice_seguro || "—"}
+                    {f.seguro_validade ? ` (válida até ${fmtDate(f.seguro_validade)})` : ""}
+                  </span>
+                  {f.seguro_validade && new Date(f.seguro_validade) < new Date() ? (
+                    <Badge variant="destructive">Seguro vencido</Badge>
+                  ) : null}
+                  {f.avaliacao_media != null ? (
+                    <Badge variant="secondary">Avaliação {Number(f.avaliacao_media).toFixed(1)}/5</Badge>
+                  ) : null}
                 </p>
                 {f.tarefas_autorizadas ? (
                   <p className="mt-2 text-sm text-muted-foreground">{f.tarefas_autorizadas}</p>

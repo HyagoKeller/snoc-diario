@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Camera, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -25,6 +26,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { ChamadoItsmField } from "@/components/ChamadoItsmField";
+import type { ChamadoItsm } from "@/lib/invgate.functions";
+import { fmtDate } from "@/lib/snoc";
 
 export const Route = createFileRoute("/_authenticated/rondas/nova")({
   head: () => ({
@@ -51,6 +55,21 @@ function NovaRonda() {
   const [umidade, setUmidade] = useState("");
   const [observacoes, setObservacoes] = useState("");
   const [busy, setBusy] = useState(false);
+  const [chamado, setChamado] = useState("");
+  const [chamadoCache, setChamadoCache] = useState<ChamadoItsm | null>(null);
+  const [anteriorId, setAnteriorId] = useState("");
+
+  const { data: anteriores = [] } = useQuery({
+    queryKey: ["rondas-anteriores"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("rondas")
+        .select("id,data,turno,total_nc")
+        .order("created_at", { ascending: false })
+        .limit(15);
+      return data ?? [];
+    },
+  });
 
   const [itens, setItens] = useState<Record<string, ItemState>>(() => {
     const base: Record<string, ItemState> = {};
@@ -96,6 +115,9 @@ function NovaRonda() {
           temperatura: temperatura ? Number(temperatura) : null,
           umidade: umidade ? Number(umidade) : null,
           observacoes: observacoes || null,
+          chamado_itsm: chamado.trim() || null,
+          chamado_itsm_cache: chamadoCache ? (chamadoCache as never) : null,
+          ronda_anterior_id: anteriorId || null,
           total_nc: totalNC,
           resultado_geral: resultadoGeral,
           finalizada: true,
@@ -203,6 +225,30 @@ function NovaRonda() {
               onChange={(e) => setUmidade(e.target.value)}
               placeholder="50"
             />
+          </div>
+        </div>
+
+        <div className="grid gap-4 border-t border-border pt-4 lg:grid-cols-2">
+          <ChamadoItsmField
+            numero={chamado}
+            onNumero={setChamado}
+            cache={chamadoCache}
+            onCache={setChamadoCache}
+          />
+          <div className="space-y-2">
+            <Label>Ronda anterior (comparação de tendência)</Label>
+            <Select value={anteriorId} onValueChange={setAnteriorId}>
+              <SelectTrigger>
+                <SelectValue placeholder="Opcional — vincular à ronda anterior" />
+              </SelectTrigger>
+              <SelectContent>
+                {anteriores.map((r) => (
+                  <SelectItem key={r.id} value={r.id}>
+                    {fmtDate(r.data)} · {r.turno} · {r.total_nc} NC
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </div>
