@@ -416,31 +416,46 @@ export type Database = {
       regras_escalonamento: {
         Row: {
           ativa: boolean
+          canal: string
           created_at: string
+          criticidade_minima: Database["public"]["Enums"]["criticidade"] | null
           destinatarios: string
           evento: string
           id: string
           nivel: number
+          notificar_coordenadores: boolean
+          notificar_gestores: boolean
+          observacao: string | null
           prazo_minutos: number
           updated_at: string
         }
         Insert: {
           ativa?: boolean
+          canal?: string
           created_at?: string
+          criticidade_minima?: Database["public"]["Enums"]["criticidade"] | null
           destinatarios: string
           evento: string
           id?: string
           nivel?: number
+          notificar_coordenadores?: boolean
+          notificar_gestores?: boolean
+          observacao?: string | null
           prazo_minutos?: number
           updated_at?: string
         }
         Update: {
           ativa?: boolean
+          canal?: string
           created_at?: string
+          criticidade_minima?: Database["public"]["Enums"]["criticidade"] | null
           destinatarios?: string
           evento?: string
           id?: string
           nivel?: number
+          notificar_coordenadores?: boolean
+          notificar_gestores?: boolean
+          observacao?: string | null
           prazo_minutos?: number
           updated_at?: string
         }
@@ -584,6 +599,74 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      turno_membros: {
+        Row: {
+          ativo: boolean
+          created_at: string
+          id: string
+          ordem: number
+          papel_turno: string
+          turno_id: string
+          user_id: string
+        }
+        Insert: {
+          ativo?: boolean
+          created_at?: string
+          id?: string
+          ordem?: number
+          papel_turno?: string
+          turno_id: string
+          user_id: string
+        }
+        Update: {
+          ativo?: boolean
+          created_at?: string
+          id?: string
+          ordem?: number
+          papel_turno?: string
+          turno_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "turno_membros_turno_id_fkey"
+            columns: ["turno_id"]
+            isOneToOne: false
+            referencedRelation: "turnos_equipe"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      turnos_equipe: {
+        Row: {
+          ativo: boolean
+          coordenadores: string | null
+          created_at: string
+          grupo_ad: string | null
+          id: string
+          turno: string
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          coordenadores?: string | null
+          created_at?: string
+          grupo_ad?: string | null
+          id?: string
+          turno: string
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          coordenadores?: string | null
+          created_at?: string
+          grupo_ad?: string | null
+          id?: string
+          turno?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {
