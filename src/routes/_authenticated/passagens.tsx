@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { AlertTriangle, Check, Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -225,7 +225,7 @@ function Passagens() {
               </Select>
             </div>
             <div className="space-y-2">
-              <Label>Operador que recebe</Label>
+              <Label>Técnico que recebe ({turnoDestino})</Label>
               <Select value={recebeId} onValueChange={setRecebeId}>
                 <SelectTrigger>
                   <SelectValue placeholder="Selecionar" />
