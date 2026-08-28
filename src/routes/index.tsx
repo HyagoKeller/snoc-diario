@@ -31,12 +31,7 @@ function Landing() {
       <div className="faixa-gov" />
 
 <header className="border-b border-border">
-        <div className="mx-auto flex max-w-5xl flex-col items-center gap-2 px-6 py-4 text-center">
-          <img
-            src={aguServicosLogo.url}
-            alt="AGU Serviços"
-            className="h-16 w-auto rounded-md bg-white/95 p-2 sm:h-20"
-          />
+        <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-6 py-3">
           <p className="label-mono truncate">Advocacia-Geral da União · SGG · DTI-CSI</p>
           <Link
             to="/faq"
