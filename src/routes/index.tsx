@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Activity, LogIn, Lock, HelpCircle } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
+import aguLogo from "@/assets/agu.png.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -22,12 +23,6 @@ export const Route = createFileRoute("/")({
   component: Landing,
 });
 
-const INDICADORES = [
-  { valor: "6 seções", texto: "Checklist oficial de ronda" },
-  { valor: "15 min", texto: "Prazo de aceite do turno" },
-  { valor: "5 anos", texto: "Retenção de evidências" },
-];
-
 function Landing() {
   const { session } = useAuth();
 
@@ -36,8 +31,15 @@ function Landing() {
       <div className="faixa-gov" />
 
       <header className="border-b border-border">
-        <div className="mx-auto grid max-w-5xl grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-6 py-4">
-          <p className="label-mono truncate">Advocacia-Geral da União · SGG · DTI-CSI</p>
+        <div className="mx-auto grid max-w-5xl grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-6 py-3">
+          <div className="flex min-w-0 items-center gap-3">
+            <img
+              src={aguLogo.url}
+              alt="Advocacia-Geral da União"
+              className="h-9 w-auto rounded-sm bg-white/95 px-2 py-1"
+            />
+            <p className="label-mono truncate">Advocacia-Geral da União · SGG · DTI-CSI</p>
+          </div>
           <Link
             to="/faq"
             className="flex shrink-0 items-center gap-2 text-xs text-muted-foreground transition-colors hover:text-foreground"
@@ -47,7 +49,7 @@ function Landing() {
         </div>
       </header>
 
-      <section className="mx-auto flex w-full max-w-5xl flex-1 flex-col items-center px-6 py-14 text-center">
+      <section className="mx-auto flex w-full max-w-5xl flex-1 flex-col items-center justify-center px-6 py-14 text-center">
         <div className="flex size-14 items-center justify-center rounded-md bg-primary/15 text-primary">
           <Activity className="size-7" />
         </div>
@@ -55,30 +57,16 @@ function Landing() {
         <p className="label-mono mt-6">Secretaria de Governança e Gestão Estratégica</p>
         <p className="label-mono">DTI — Coordenação de Segurança da Informação</p>
 
-        <h1 className="mt-4 text-4xl font-bold text-primary sm:text-5xl">
-          SNOC
-        </h1>
+        <h1 className="mt-4 text-4xl font-bold text-primary sm:text-5xl">SNOC</h1>
         <p className="mt-4 max-w-xl text-sm text-muted-foreground sm:text-base">
           Diário de bordo operacional: rondas, passagem de turno, gestão de acesso de terceiros e
           ordens de serviço.
         </p>
 
-        <dl className="mt-10 grid w-full max-w-2xl gap-3 sm:grid-cols-3">
-          {INDICADORES.map((i) => (
-            <div key={i.valor} className="panel px-4 py-4">
-              <dt className="font-display text-base font-bold">{i.valor}</dt>
-              <dd className="mt-1 text-xs text-muted-foreground">{i.texto}</dd>
-            </div>
-          ))}
-        </dl>
-
-        <div className="panel mt-10 w-full max-w-sm overflow-hidden text-left">
+        <div className="panel mt-10 w-full max-w-sm overflow-hidden text-center">
           <div className="faixa-gov" />
           <div className="space-y-3 p-5">
             <p className="text-sm font-semibold">Acesso institucional</p>
-            <p className="text-xs text-muted-foreground">
-              Perfil atribuído pela chefia do SNOC. Utilize seu e-mail @agu.gov.br.
-            </p>
             <Button asChild className="w-full">
               <Link to={session ? "/painel" : "/auth"}>
                 <LogIn className="size-4" />
@@ -111,3 +99,4 @@ function Landing() {
     </main>
   );
 }
+
