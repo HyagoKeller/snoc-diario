@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Activity, LogIn, Lock, HelpCircle } from "lucide-react";
+import { LogIn, Lock, HelpCircle } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import aguServicosLogo from "@/assets/aguservicos.png.asset.json";
