@@ -35,7 +35,7 @@ function Landing() {
           <img
             src={aguServicosLogo.url}
             alt="AGU Serviços"
-            className="h-16 w-auto sm:h-20"
+            className="h-16 w-auto rounded-md bg-white/95 p-2 sm:h-20"
           />
           <p className="label-mono truncate">Advocacia-Geral da União · SGG · DTI-CSI</p>
           <Link
