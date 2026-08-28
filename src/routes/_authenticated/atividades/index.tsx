@@ -21,7 +21,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ChamadoItsmField } from "@/components/ChamadoItsmField";
+import { ChamadoItsmField, ChamadosItsmMulti } from "@/components/ChamadoItsmField";
 import type { ChamadoItsm } from "@/lib/invgate.functions";
 
 export const Route = createFileRoute("/_authenticated/atividades/")({
@@ -57,6 +57,8 @@ function Atividades() {
   const [busy, setBusy] = useState(false);
   const [chamado, setChamado] = useState("");
   const [chamadoCache, setChamadoCache] = useState<ChamadoItsm | null>(null);
+  const [chamadosExtra, setChamadosExtra] = useState<string[]>([]);
+  const [chamadosExtraCache, setChamadosExtraCache] = useState<ChamadoItsm[]>([]);
   const [osFornecedor, setOsFornecedor] = useState("");
   const [custo, setCusto] = useState("");
   const [garantia, setGarantia] = useState("");
@@ -98,6 +100,8 @@ function Atividades() {
           status: inicio ? "agendada" : "aberta",
           chamado_itsm: chamado.trim() || null,
           chamado_itsm_cache: chamadoCache ? (chamadoCache as never) : null,
+          chamados_itsm: chamadosExtra,
+          chamados_itsm_cache: chamadosExtraCache as never,
           numero_os_fornecedor: osFornecedor.trim() || null,
           custo: custo ? Number(custo) : null,
           garantia_ate: garantia || null,
@@ -279,6 +283,12 @@ Aberta por ${profile?.nome ?? "SNOC"}.`,
             onNumero={setChamado}
             cache={chamadoCache}
             onCache={setChamadoCache}
+          />
+          <ChamadosItsmMulti
+            numeros={chamadosExtra}
+            onNumeros={setChamadosExtra}
+            caches={chamadosExtraCache}
+            onCaches={setChamadosExtraCache}
           />
           <div className="space-y-2">
             <Label>Descrição do serviço</Label>

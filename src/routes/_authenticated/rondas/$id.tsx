@@ -6,7 +6,7 @@ import { signedUrl } from "@/lib/storage";
 import { CRITICIDADE_LABEL, STATUS_LABEL, criticidadeToken, fmtDate } from "@/lib/snoc";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ChamadoItsmCard } from "@/components/ChamadoItsmField";
+import { ChamadoItsmCard, ChamadosItsmLista } from "@/components/ChamadoItsmField";
 
 export const Route = createFileRoute("/_authenticated/rondas/$id")({
   head: () => ({

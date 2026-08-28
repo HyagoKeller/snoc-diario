@@ -26,7 +26,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ChamadoItsmField } from "@/components/ChamadoItsmField";
+import { ChamadoItsmField, ChamadosItsmMulti } from "@/components/ChamadoItsmField";
 import type { ChamadoItsm } from "@/lib/invgate.functions";
 import { fmtDate } from "@/lib/snoc";
 
@@ -57,6 +57,8 @@ function NovaRonda() {
   const [busy, setBusy] = useState(false);
   const [chamado, setChamado] = useState("");
   const [chamadoCache, setChamadoCache] = useState<ChamadoItsm | null>(null);
+  const [chamadosExtra, setChamadosExtra] = useState<string[]>([]);
+  const [chamadosExtraCache, setChamadosExtraCache] = useState<ChamadoItsm[]>([]);
   const [anteriorId, setAnteriorId] = useState("");
 
   const { data: anteriores = [] } = useQuery({
@@ -117,6 +119,8 @@ function NovaRonda() {
           observacoes: observacoes || null,
           chamado_itsm: chamado.trim() || null,
           chamado_itsm_cache: chamadoCache ? (chamadoCache as never) : null,
+          chamados_itsm: chamadosExtra,
+          chamados_itsm_cache: chamadosExtraCache as never,
           ronda_anterior_id: anteriorId || null,
           total_nc: totalNC,
           resultado_geral: resultadoGeral,
@@ -248,6 +252,14 @@ function NovaRonda() {
             cache={chamadoCache}
             onCache={setChamadoCache}
           />
+          <div className="lg:col-span-2">
+            <ChamadosItsmMulti
+              numeros={chamadosExtra}
+              onNumeros={setChamadosExtra}
+              caches={chamadosExtraCache}
+              onCaches={setChamadosExtraCache}
+            />
+          </div>
           <div className="space-y-2">
             <Label>Ronda anterior (comparação de tendência)</Label>
             <Select value={anteriorId} onValueChange={setAnteriorId}>
