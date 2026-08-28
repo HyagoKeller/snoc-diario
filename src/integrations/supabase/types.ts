@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      arquivos_externos: {
+        Row: {
+          created_at: string
+          destino: string
+          entidade: string
+          entidade_id: string | null
+          enviado_por: string
+          id: string
+          nome_arquivo: string
+          pasta: string
+          tamanho_bytes: number | null
+          updated_at: string
+          web_url: string | null
+        }
+        Insert: {
+          created_at?: string
+          destino?: string
+          entidade: string
+          entidade_id?: string | null
+          enviado_por: string
+          id?: string
+          nome_arquivo: string
+          pasta: string
+          tamanho_bytes?: number | null
+          updated_at?: string
+          web_url?: string | null
+        }
+        Update: {
+          created_at?: string
+          destino?: string
+          entidade?: string
+          entidade_id?: string | null
+          enviado_por?: string
+          id?: string
+          nome_arquivo?: string
+          pasta?: string
+          tamanho_bytes?: number | null
+          updated_at?: string
+          web_url?: string | null
+        }
+        Relationships: []
+      }
       atividade_evidencias: {
         Row: {
           aprovado_em: string | null
@@ -65,6 +107,8 @@ export type Database = {
           ativo_afetado: string | null
           chamado_itsm: string | null
           chamado_itsm_cache: Json | null
+          chamados_itsm: string[]
+          chamados_itsm_cache: Json
           codigo: number
           criticidade: Database["public"]["Enums"]["criticidade"]
           custo: number | null
@@ -89,6 +133,8 @@ export type Database = {
           ativo_afetado?: string | null
           chamado_itsm?: string | null
           chamado_itsm_cache?: Json | null
+          chamados_itsm?: string[]
+          chamados_itsm_cache?: Json
           codigo?: number
           criticidade?: Database["public"]["Enums"]["criticidade"]
           custo?: number | null
@@ -113,6 +159,8 @@ export type Database = {
           ativo_afetado?: string | null
           chamado_itsm?: string | null
           chamado_itsm_cache?: Json | null
+          chamados_itsm?: string[]
+          chamados_itsm_cache?: Json
           codigo?: number
           criticidade?: Database["public"]["Enums"]["criticidade"]
           custo?: number | null
@@ -329,6 +377,8 @@ export type Database = {
       passagens_turno: {
         Row: {
           aceito_em: string | null
+          chamados_itsm: string[]
+          chamados_itsm_cache: Json
           contingencia_ativa: boolean
           contingencia_descricao: string | null
           created_at: string
@@ -347,6 +397,8 @@ export type Database = {
         }
         Insert: {
           aceito_em?: string | null
+          chamados_itsm?: string[]
+          chamados_itsm_cache?: Json
           contingencia_ativa?: boolean
           contingencia_descricao?: string | null
           created_at?: string
@@ -365,6 +417,8 @@ export type Database = {
         }
         Update: {
           aceito_em?: string | null
+          chamados_itsm?: string[]
+          chamados_itsm_cache?: Json
           contingencia_ativa?: boolean
           contingencia_descricao?: string | null
           created_at?: string
@@ -539,6 +593,8 @@ export type Database = {
         Row: {
           chamado_itsm: string | null
           chamado_itsm_cache: Json | null
+          chamados_itsm: string[]
+          chamados_itsm_cache: Json
           created_at: string
           data: string
           finalizada: boolean
@@ -557,6 +613,8 @@ export type Database = {
         Insert: {
           chamado_itsm?: string | null
           chamado_itsm_cache?: Json | null
+          chamados_itsm?: string[]
+          chamados_itsm_cache?: Json
           created_at?: string
           data?: string
           finalizada?: boolean
@@ -575,6 +633,8 @@ export type Database = {
         Update: {
           chamado_itsm?: string | null
           chamado_itsm_cache?: Json | null
+          chamados_itsm?: string[]
+          chamados_itsm_cache?: Json
           created_at?: string
           data?: string
           finalizada?: boolean
