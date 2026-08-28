@@ -16,6 +16,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { ROLE_LABEL } from "@/lib/snoc";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import aguServicosLogo from "@/assets/aguservicos.png.asset.json";
 
 const NAV = [
   { to: "/painel", label: "Painel", icon: LayoutDashboard, need: "all" },
