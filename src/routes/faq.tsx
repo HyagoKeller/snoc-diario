@@ -118,6 +118,15 @@ function Faq() {
           .
         </p>
 
+        <dl className="mt-8 grid gap-3 sm:grid-cols-3">
+          {NUMEROS.map((n) => (
+            <div key={n.valor} className="panel px-4 py-4">
+              <dt className="font-display text-base font-bold">{n.valor}</dt>
+              <dd className="mt-1 text-xs text-muted-foreground">{n.texto}</dd>
+            </div>
+          ))}
+        </dl>
+
 
         <h2 className="mt-10 text-lg font-semibold">O que o sistema registra</h2>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
