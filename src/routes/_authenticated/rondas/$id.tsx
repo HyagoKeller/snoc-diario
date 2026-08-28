@@ -6,7 +6,7 @@ import { signedUrl } from "@/lib/storage";
 import { CRITICIDADE_LABEL, STATUS_LABEL, criticidadeToken, fmtDate } from "@/lib/snoc";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ChamadoItsmCard } from "@/components/ChamadoItsmField";
+import { ChamadoItsmCard, ChamadosItsmLista } from "@/components/ChamadoItsmField";
 
 export const Route = createFileRoute("/_authenticated/rondas/$id")({
   head: () => ({
@@ -88,6 +88,9 @@ function DetalheRonda() {
             <ChamadoItsmCard numero={ronda.chamado_itsm} cache={ronda.chamado_itsm_cache} />
           </div>
         ) : null}
+        <div className="mt-3">
+          <ChamadosItsmLista numeros={ronda.chamados_itsm} cache={ronda.chamados_itsm_cache} />
+        </div>
         {data?.anterior ? (
           <div className="mt-4 rounded-md border border-border p-3 text-sm">
             <p className="label-mono">Comparação com a ronda anterior</p>

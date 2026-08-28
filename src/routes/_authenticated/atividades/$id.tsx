@@ -18,7 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ChamadoItsmCard } from "@/components/ChamadoItsmField";
+import { ChamadoItsmCard, ChamadosItsmLista } from "@/components/ChamadoItsmField";
 import { fmtDate } from "@/lib/snoc";
 
 export const Route = createFileRoute("/_authenticated/atividades/$id")({
@@ -230,6 +230,9 @@ function DetalheOS() {
             <ChamadoItsmCard numero={a.chamado_itsm} cache={a.chamado_itsm_cache} />
           </div>
         ) : null}
+        <div className="mt-3">
+          <ChamadosItsmLista numeros={a.chamados_itsm} cache={a.chamados_itsm_cache} />
+        </div>
         {a.descricao ? <p className="mt-4 text-sm text-muted-foreground">{a.descricao}</p> : null}
       </header>
 
