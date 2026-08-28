@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Activity, LogIn, Lock, HelpCircle } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import aguLogo from "@/assets/agu.png.asset.json";
+import aguServicosLogo from "@/assets/aguservicos.png.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -30,16 +30,14 @@ function Landing() {
     <main className="flex min-h-screen flex-col">
       <div className="faixa-gov" />
 
-      <header className="border-b border-border">
-        <div className="mx-auto grid max-w-5xl grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-6 py-3">
-          <div className="flex min-w-0 items-center gap-3">
-            <img
-              src={aguLogo.url}
-              alt="Advocacia-Geral da União"
-              className="h-9 w-auto rounded-sm bg-white/95 px-2 py-1"
-            />
-            <p className="label-mono truncate">Advocacia-Geral da União · SGG · DTI-CSI</p>
-          </div>
+<header className="border-b border-border">
+        <div className="mx-auto flex max-w-5xl flex-col items-center gap-2 px-6 py-4 text-center">
+          <img
+            src={aguServicosLogo.url}
+            alt="AGU Serviços"
+            className="h-16 w-auto rounded-md bg-white/95 p-2 sm:h-20"
+          />
+          <p className="label-mono truncate">Advocacia-Geral da União · SGG · DTI-CSI</p>
           <Link
             to="/faq"
             className="flex shrink-0 items-center gap-2 text-xs text-muted-foreground transition-colors hover:text-foreground"
