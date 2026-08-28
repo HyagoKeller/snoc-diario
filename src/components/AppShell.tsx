@@ -69,8 +69,8 @@ export function AppShell({ children }: { children: ReactNode }) {
 
 
         <Link to="/painel" className="flex items-center gap-3 px-2 py-3">
-          <div className="flex size-9 items-center justify-center rounded-md bg-primary/15 text-primary">
-            <Activity className="size-5" />
+<div className="flex size-10 items-center justify-center overflow-hidden rounded-md bg-primary/15">
+            <img src={aguServicosLogo.url} alt="AGU Serviços" className="size-8 rounded-full" />
           </div>
           <div>
             <p className="font-display leading-none font-bold">SNOC</p>
