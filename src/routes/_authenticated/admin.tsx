@@ -1,11 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Plus, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { registrarAuditoria } from "@/lib/notificacoes";
+import { testarSharepoint } from "@/lib/sharepoint.functions";
 import { ROLE_LABEL, fmtDateTime, type AppRole } from "@/lib/snoc";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -64,6 +66,7 @@ function Admin() {
   const [spBiblioteca, setSpBiblioteca] = useState("");
   const [spPasta, setSpPasta] = useState("SNOC");
   const [spBusy, setSpBusy] = useState(false);
+  const testarSp = useServerFn(testarSharepoint);
 
   const { data } = useQuery({
     queryKey: ["admin"],
