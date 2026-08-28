@@ -31,6 +31,13 @@ export const Route = createFileRoute("/_authenticated/admin")({
 
 const EVENTOS = [
   { valor: "ronda_nc_critica", label: "Ronda com NC crítica" },
+  { valor: "ronda_nc", label: "Ronda com qualquer não conformidade" },
+  { valor: "saida_equipamento", label: "Saída de equipamento do Data Center" },
+  { valor: "entrada_equipamento", label: "Entrada / instalação de equipamento" },
+  { valor: "passagem_enviada", label: "Passagem enviada ao técnico do próximo turno" },
+  { valor: "passagem_sem_destinatario", label: "Passagem sem técnico escalado no próximo turno" },
+  { valor: "contingencia_ativa", label: "Turno encerrado em contingência" },
+  { valor: "visita_sem_acompanhante", label: "Terceiro sem acompanhante registrado" },
   { valor: "passagem_sem_aceite", label: "Passagem de turno sem aceite no prazo" },
   { valor: "abertura_os", label: "Abertura de atividade / OS" },
   { valor: "checkout_atrasado", label: "Prestador sem check-out no prazo" },
@@ -44,6 +51,13 @@ function Admin() {
   const [prazo, setPrazo] = useState("15");
   const [nivel, setNivel] = useState("1");
   const [destinatarios, setDestinatarios] = useState("");
+  const [critMin, setCritMin] = useState<string>("nenhuma");
+  const [notifCoord, setNotifCoord] = useState(true);
+  const [notifGest, setNotifGest] = useState(false);
+  const [observacao, setObservacao] = useState("");
+  const [novoMembro, setNovoMembro] = useState<Record<string, string>>({});
+  const [grupos, setGrupos] = useState<Record<string, string>>({});
+  const [coords, setCoords] = useState<Record<string, string>>({});
   const [baseUrl, setBaseUrl] = useState("");
 
   const { data } = useQuery({
@@ -56,6 +70,8 @@ function Admin() {
         { data: notifs },
         { data: aud },
         { data: integ },
+        { data: turnos },
+        { data: membros },
       ] = await Promise.all([
         supabase.from("profiles").select("*").order("nome"),
         supabase.from("user_roles").select("*"),
@@ -63,6 +79,8 @@ function Admin() {
         supabase.from("notificacoes").select("*").order("enviado_em", { ascending: false }).limit(100),
         supabase.from("auditoria").select("*").order("created_at", { ascending: false }).limit(100),
         supabase.from("integracoes_config").select("*").eq("chave", "invgate_base_url").maybeSingle(),
+        supabase.from("turnos_equipe").select("*").order("turno"),
+        supabase.from("turno_membros").select("*").order("ordem"),
       ]);
       return {
         perfis: perfis ?? [],
@@ -71,6 +89,8 @@ function Admin() {
         notifs: notifs ?? [],
         auditoria: aud ?? [],
         integracoes: integ ?? null,
+        turnos: turnos ?? [],
+        membros: membros ?? [],
       };
     },
   });
@@ -81,6 +101,55 @@ function Admin() {
   useEffect(() => {
     if (data?.integracoes) setBaseUrl(data.integracoes.valor);
   }, [data?.integracoes]);
+
+  useEffect(() => {
+    if (!data?.turnos) return;
+    setGrupos(Object.fromEntries(data.turnos.map((t) => [t.id, t.grupo_ad ?? ""])));
+    setCoords(Object.fromEntries(data.turnos.map((t) => [t.id, t.coordenadores ?? ""])));
+  }, [data?.turnos]);
+
+  async function salvarTurno(id: string) {
+    const { error } = await supabase
+      .from("turnos_equipe")
+      .update({ grupo_ad: (grupos[id] ?? "").trim() || null, coordenadores: (coords[id] ?? "").trim() })
+      .eq("id", id);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    await registrarAuditoria("atualizar_turno", "turnos_equipe", id);
+    toast.success("Turno atualizado");
+    qc.invalidateQueries({ queryKey: ["admin"] });
+  }
+
+  async function adicionarMembro(turnoId: string, papel: string) {
+    const userId = novoMembro[turnoId];
+    if (!userId) {
+      toast.error("Selecione o técnico.");
+      return;
+    }
+    const ordem = (data?.membros ?? []).filter((m) => m.turno_id === turnoId).length + 1;
+    const { error } = await supabase
+      .from("turno_membros")
+      .insert({ turno_id: turnoId, user_id: userId, papel_turno: papel, ordem });
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    setNovoMembro((p) => ({ ...p, [turnoId]: "" }));
+    await registrarAuditoria("escalar_tecnico", "turno_membros", turnoId, { userId, papel });
+    toast.success("Técnico escalado");
+    qc.invalidateQueries({ queryKey: ["admin"] });
+  }
+
+  async function removerMembro(id: string) {
+    const { error } = await supabase.from("turno_membros").delete().eq("id", id);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    qc.invalidateQueries({ queryKey: ["admin"] });
+  }
 
   async function salvarIntegracao() {
     const valor = baseUrl.trim().replace(/\/+$/, "");
@@ -126,12 +195,17 @@ function Admin() {
       prazo_minutos: Number(prazo || 15),
       nivel: Number(nivel || 1),
       destinatarios,
+      criticidade_minima: critMin === "nenhuma" ? null : (critMin as "baixa" | "media" | "alta" | "critica"),
+      notificar_coordenadores: notifCoord,
+      notificar_gestores: notifGest,
+      observacao: observacao.trim() || null,
     });
     if (error) {
       toast.error(error.message);
       return;
     }
     setDestinatarios("");
+    setObservacao("");
     toast.success("Regra cadastrada");
     qc.invalidateQueries({ queryKey: ["admin"] });
   }
