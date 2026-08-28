@@ -117,6 +117,12 @@ export function turnoAtual(): string {
   return TURNOS[2];
 }
 
+export function proximoTurno(turno: string): string {
+  const i = (TURNOS as readonly string[]).indexOf(turno);
+  if (i < 0) return TURNOS[0];
+  return TURNOS[(i + 1) % TURNOS.length]!;
+}
+
 export function fmtDateTime(value?: string | null) {
   if (!value) return "—";
   return new Date(value).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" });

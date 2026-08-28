@@ -1,12 +1,20 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { AlertTriangle, Check, Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { dispararNotificacao, registrarAuditoria } from "@/lib/notificacoes";
-import { CRITICIDADE_LABEL, TURNOS, fmtDate, fmtDateTime, turnoAtual, type Criticidade } from "@/lib/snoc";
+import { dispararNotificacao, registrarAuditoria, tecnicosDoTurno } from "@/lib/notificacoes";
+import {
+  CRITICIDADE_LABEL,
+  TURNOS,
+  fmtDate,
+  fmtDateTime,
+  proximoTurno,
+  turnoAtual,
+  type Criticidade,
+} from "@/lib/snoc";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -62,6 +70,17 @@ function Passagens() {
 
   const passagens = data?.passagens ?? [];
   const perfis = data?.perfis ?? [];
+  const turnoDestino = proximoTurno(turno);
+
+  const { data: escala } = useQuery({
+    queryKey: ["escala-turno", turnoDestino],
+    queryFn: () => tecnicosDoTurno(turnoDestino),
+  });
+
+  useEffect(() => {
+    const candidato = (escala ?? []).find((t) => t.user_id !== user?.id);
+    if (candidato) setRecebeId(candidato.user_id);
+  }, [escala, user?.id]);
 
   async function criar() {
     if (!user) return;
@@ -97,8 +116,31 @@ function Passagens() {
           })),
         );
       }
-      await registrarAuditoria("criar", "passagens_turno", p.id, { turno });
-      toast.success("Passagem registrada. Aguardando aceite do turno seguinte.");
+      await registrarAuditoria("criar", "passagens_turno", p.id, { turno, turnoDestino });
+
+      const destinoEmail = perfis.find((x) => x.id === (recebeId || null))?.email;
+      const enviados = await dispararNotificacao(
+        "passagem_enviada",
+        `[SNOC] Passagem do turno ${turno} para o turno ${turnoDestino}`,
+        `A passagem do turno ${turno} foi registrada por ${profile?.nome ?? "operador"} e aguarda aceite do técnico escalado para o turno ${turnoDestino} até ${new Date(prazo).toLocaleString("pt-BR")}.`,
+        { tipo: "passagem_turno", id: p.id },
+        destinoEmail ? [destinoEmail] : [],
+        { turno: turnoDestino },
+      );
+
+      if (!destinoEmail || enviados === 0) {
+        await dispararNotificacao(
+          "passagem_sem_destinatario",
+          `[SNOC] Passagem do turno ${turno} sem técnico escalado`,
+          `Não foi possível notificar um técnico do turno ${turnoDestino}. Verifique a escala em Administração › Turnos e equipes.`,
+          { tipo: "passagem_turno", id: p.id },
+          [],
+          { turno: turnoDestino },
+        );
+        toast.warning("Passagem registrada, mas sem técnico escalado no próximo turno — gerência notificada.");
+      } else {
+        toast.success(`Passagem registrada e enviada para ${enviados} destinatário(s) do turno ${turnoDestino}.`);
+      }
       setAberto(false);
       setPendencias([]);
       setStatusSistemas("");
@@ -183,7 +225,7 @@ function Passagens() {
               </Select>
             </div>
             <div className="space-y-2">
-              <Label>Operador que recebe</Label>
+              <Label>Técnico que recebe ({turnoDestino})</Label>
               <Select value={recebeId} onValueChange={setRecebeId}>
                 <SelectTrigger>
                   <SelectValue placeholder="Selecionar" />

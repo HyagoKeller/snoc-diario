@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export const Route = createFileRoute("/_authenticated/admin")({
@@ -31,6 +32,13 @@ export const Route = createFileRoute("/_authenticated/admin")({
 
 const EVENTOS = [
   { valor: "ronda_nc_critica", label: "Ronda com NC crítica" },
+  { valor: "ronda_nc", label: "Ronda com qualquer não conformidade" },
+  { valor: "saida_equipamento", label: "Saída de equipamento do Data Center" },
+  { valor: "entrada_equipamento", label: "Entrada / instalação de equipamento" },
+  { valor: "passagem_enviada", label: "Passagem enviada ao técnico do próximo turno" },
+  { valor: "passagem_sem_destinatario", label: "Passagem sem técnico escalado no próximo turno" },
+  { valor: "contingencia_ativa", label: "Turno encerrado em contingência" },
+  { valor: "visita_sem_acompanhante", label: "Terceiro sem acompanhante registrado" },
   { valor: "passagem_sem_aceite", label: "Passagem de turno sem aceite no prazo" },
   { valor: "abertura_os", label: "Abertura de atividade / OS" },
   { valor: "checkout_atrasado", label: "Prestador sem check-out no prazo" },
@@ -44,6 +52,13 @@ function Admin() {
   const [prazo, setPrazo] = useState("15");
   const [nivel, setNivel] = useState("1");
   const [destinatarios, setDestinatarios] = useState("");
+  const [critMin, setCritMin] = useState<string>("nenhuma");
+  const [notifCoord, setNotifCoord] = useState(true);
+  const [notifGest, setNotifGest] = useState(false);
+  const [observacao, setObservacao] = useState("");
+  const [novoMembro, setNovoMembro] = useState<Record<string, string>>({});
+  const [grupos, setGrupos] = useState<Record<string, string>>({});
+  const [coords, setCoords] = useState<Record<string, string>>({});
   const [baseUrl, setBaseUrl] = useState("");
 
   const { data } = useQuery({
@@ -56,6 +71,8 @@ function Admin() {
         { data: notifs },
         { data: aud },
         { data: integ },
+        { data: turnos },
+        { data: membros },
       ] = await Promise.all([
         supabase.from("profiles").select("*").order("nome"),
         supabase.from("user_roles").select("*"),
@@ -63,6 +80,8 @@ function Admin() {
         supabase.from("notificacoes").select("*").order("enviado_em", { ascending: false }).limit(100),
         supabase.from("auditoria").select("*").order("created_at", { ascending: false }).limit(100),
         supabase.from("integracoes_config").select("*").eq("chave", "invgate_base_url").maybeSingle(),
+        supabase.from("turnos_equipe").select("*").order("turno"),
+        supabase.from("turno_membros").select("*").order("ordem"),
       ]);
       return {
         perfis: perfis ?? [],
@@ -71,6 +90,8 @@ function Admin() {
         notifs: notifs ?? [],
         auditoria: aud ?? [],
         integracoes: integ ?? null,
+        turnos: turnos ?? [],
+        membros: membros ?? [],
       };
     },
   });
@@ -81,6 +102,55 @@ function Admin() {
   useEffect(() => {
     if (data?.integracoes) setBaseUrl(data.integracoes.valor);
   }, [data?.integracoes]);
+
+  useEffect(() => {
+    if (!data?.turnos) return;
+    setGrupos(Object.fromEntries(data.turnos.map((t) => [t.id, t.grupo_ad ?? ""])));
+    setCoords(Object.fromEntries(data.turnos.map((t) => [t.id, t.coordenadores ?? ""])));
+  }, [data?.turnos]);
+
+  async function salvarTurno(id: string) {
+    const { error } = await supabase
+      .from("turnos_equipe")
+      .update({ grupo_ad: (grupos[id] ?? "").trim() || null, coordenadores: (coords[id] ?? "").trim() })
+      .eq("id", id);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    await registrarAuditoria("atualizar_turno", "turnos_equipe", id);
+    toast.success("Turno atualizado");
+    qc.invalidateQueries({ queryKey: ["admin"] });
+  }
+
+  async function adicionarMembro(turnoId: string, papel: string) {
+    const userId = novoMembro[turnoId];
+    if (!userId) {
+      toast.error("Selecione o técnico.");
+      return;
+    }
+    const ordem = (data?.membros ?? []).filter((m) => m.turno_id === turnoId).length + 1;
+    const { error } = await supabase
+      .from("turno_membros")
+      .insert({ turno_id: turnoId, user_id: userId, papel_turno: papel, ordem });
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    setNovoMembro((p) => ({ ...p, [turnoId]: "" }));
+    await registrarAuditoria("escalar_tecnico", "turno_membros", turnoId, { userId, papel });
+    toast.success("Técnico escalado");
+    qc.invalidateQueries({ queryKey: ["admin"] });
+  }
+
+  async function removerMembro(id: string) {
+    const { error } = await supabase.from("turno_membros").delete().eq("id", id);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    qc.invalidateQueries({ queryKey: ["admin"] });
+  }
 
   async function salvarIntegracao() {
     const valor = baseUrl.trim().replace(/\/+$/, "");
@@ -126,12 +196,17 @@ function Admin() {
       prazo_minutos: Number(prazo || 15),
       nivel: Number(nivel || 1),
       destinatarios,
+      criticidade_minima: critMin === "nenhuma" ? null : (critMin as "baixa" | "media" | "alta" | "critica"),
+      notificar_coordenadores: notifCoord,
+      notificar_gestores: notifGest,
+      observacao: observacao.trim() || null,
     });
     if (error) {
       toast.error(error.message);
       return;
     }
     setDestinatarios("");
+    setObservacao("");
     toast.success("Regra cadastrada");
     qc.invalidateQueries({ queryKey: ["admin"] });
   }
@@ -168,6 +243,7 @@ function Admin() {
       <Tabs defaultValue="usuarios">
         <TabsList>
           <TabsTrigger value="usuarios">Usuários e papéis</TabsTrigger>
+          <TabsTrigger value="turnos">Turnos e equipes</TabsTrigger>
           <TabsTrigger value="regras">Notificações</TabsTrigger>
           <TabsTrigger value="disparos">Disparos</TabsTrigger>
           <TabsTrigger value="auditoria">Auditoria</TabsTrigger>
@@ -220,6 +296,91 @@ function Admin() {
           </p>
         </TabsContent>
 
+        <TabsContent value="turnos" className="space-y-4 pt-4">
+          <p className="text-sm text-muted-foreground">
+            Cada turno recebe um grupo do Active Directory (origem dos técnicos) e os e-mails dos
+            coordenadores que devem ser avisados. A passagem de turno é enviada ao primeiro técnico
+            ativo do turno seguinte; se não houver técnico escalado, a gerência é notificada.
+          </p>
+          {(data?.turnos ?? []).map((t) => {
+            const membros = (data?.membros ?? []).filter((m) => m.turno_id === t.id);
+            return (
+              <section key={t.id} className="panel space-y-4 p-5">
+                <h2 className="text-base font-semibold">{t.turno}</h2>
+                <div className="grid gap-4 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
+                  <div className="space-y-2">
+                    <Label>Grupo do AD</Label>
+                    <Input
+                      value={grupos[t.id] ?? ""}
+                      onChange={(e) => setGrupos((p) => ({ ...p, [t.id]: e.target.value }))}
+                      placeholder="AGU\\SNOC-Turno-Manha"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Coordenadores (e-mails separados por vírgula)</Label>
+                    <Input
+                      value={coords[t.id] ?? ""}
+                      onChange={(e) => setCoords((p) => ({ ...p, [t.id]: e.target.value }))}
+                      placeholder="coordenacao@agu.gov.br"
+                    />
+                  </div>
+                  <Button onClick={() => salvarTurno(t.id)}>Salvar</Button>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Técnicos escalados</Label>
+                  <div className="divide-y divide-border rounded-md border border-border">
+                    {membros.map((m, idx) => (
+                      <div key={m.id} className="flex items-center justify-between gap-3 p-3 text-sm">
+                        <span>
+                          {idx + 1}. {perfis.find((p) => p.id === m.user_id)?.nome ?? m.user_id}
+                          <span className="ml-2 text-xs text-muted-foreground">
+                            {m.papel_turno === "lider" ? "Líder do turno" : "Técnico"}
+                          </span>
+                        </span>
+                        <Button variant="ghost" size="sm" onClick={() => removerMembro(m.id)}>
+                          <Trash2 className="size-4" />
+                        </Button>
+                      </div>
+                    ))}
+                    {membros.length === 0 ? (
+                      <p className="p-3 text-sm text-muted-foreground">
+                        Nenhum técnico escalado — passagens deste turno vão escalar para a gerência.
+                      </p>
+                    ) : null}
+                  </div>
+                </div>
+
+                <div className="grid gap-3 sm:grid-cols-[1fr_auto_auto]">
+                  <Select
+                    value={novoMembro[t.id] ?? ""}
+                    onValueChange={(v) => setNovoMembro((p) => ({ ...p, [t.id]: v }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecionar técnico" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {perfis
+                        .filter((p) => !membros.some((m) => m.user_id === p.id))
+                        .map((p) => (
+                          <SelectItem key={p.id} value={p.id}>
+                            {p.nome || p.email}
+                          </SelectItem>
+                        ))}
+                    </SelectContent>
+                  </Select>
+                  <Button variant="outline" onClick={() => adicionarMembro(t.id, "tecnico")}>
+                    <Plus className="size-4" /> Técnico
+                  </Button>
+                  <Button variant="outline" onClick={() => adicionarMembro(t.id, "lider")}>
+                    <Plus className="size-4" /> Líder
+                  </Button>
+                </div>
+              </section>
+            );
+          })}
+        </TabsContent>
+
         <TabsContent value="regras" className="space-y-4 pt-4">
           <section className="panel space-y-4 p-5">
             <h2 className="text-base font-semibold">Nova regra</h2>
@@ -256,6 +417,45 @@ function Admin() {
                 />
               </div>
             </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label>Criticidade mínima para disparar</Label>
+                <Select value={critMin} onValueChange={setCritMin}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="nenhuma">Qualquer ocorrência</SelectItem>
+                    <SelectItem value="baixa">Baixa ou acima</SelectItem>
+                    <SelectItem value="media">Média ou acima</SelectItem>
+                    <SelectItem value="alta">Alta ou acima</SelectItem>
+                    <SelectItem value="critica">Somente crítica</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>Observação da regra (opcional)</Label>
+                <Input
+                  value={observacao}
+                  onChange={(e) => setObservacao(e.target.value)}
+                  placeholder="Ex.: aviso imediato à coordenação em saída de equipamento"
+                />
+              </div>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <label className="flex items-start gap-3 rounded-md border border-border p-3 text-sm">
+                <Checkbox checked={notifCoord} onCheckedChange={(v) => setNotifCoord(v === true)} />
+                <span className="text-muted-foreground">
+                  Notificar os coordenadores cadastrados no turno relacionado ao evento.
+                </span>
+              </label>
+              <label className="flex items-start gap-3 rounded-md border border-border p-3 text-sm">
+                <Checkbox checked={notifGest} onCheckedChange={(v) => setNotifGest(v === true)} />
+                <span className="text-muted-foreground">
+                  Notificar gestores e Super Admins (usado quando o aviso ao técnico falha).
+                </span>
+              </label>
+            </div>
             <Button onClick={criarRegra}>
               <Plus className="size-4" /> Cadastrar regra
             </Button>
@@ -269,7 +469,15 @@ function Admin() {
                     {EVENTOS.find((e) => e.valor === r.evento)?.label ?? r.evento}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    Nível {r.nivel} · {r.prazo_minutos} min · {r.destinatarios}
+                    Nível {r.nivel} · {r.prazo_minutos} min · {r.destinatarios || "sem e-mail fixo"}
+                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {r.criticidade_minima
+                      ? `Criticidade mínima: ${r.criticidade_minima}`
+                      : "Qualquer criticidade"}
+                    {r.notificar_coordenadores ? " · coordenadores do turno" : ""}
+                    {r.notificar_gestores ? " · gestores" : ""}
+                    {r.observacao ? ` · ${r.observacao}` : ""}
                   </p>
                 </div>
                 <Button variant="ghost" size="sm" onClick={() => removerRegra(r.id)}>
