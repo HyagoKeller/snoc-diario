@@ -9,7 +9,7 @@ import { CRITICIDADE_LABEL, criticidadeToken, fmtDate } from "@/lib/snoc";
 export const Route = createFileRoute("/_authenticated/rondas/")({
   head: () => ({
     meta: [
-      { title: "Rondas operacionais | SNOC OPS" },
+      { title: "Rondas operacionais | SNOC" },
       {
         name: "description",
         content: "Histórico de rondas do Data Center com não conformidades, criticidade e evidência fotográfica.",

@@ -24,7 +24,7 @@ import { fmtDate } from "@/lib/snoc";
 export const Route = createFileRoute("/_authenticated/atividades/$id")({
   head: () => ({
     meta: [
-      { title: "Ordem de serviço | SNOC OPS" },
+      { title: "Ordem de serviço | SNOC" },
       { name: "description", content: "Evidências antes/depois, laudo do fornecedor e fechamento da OS." },
       { property: "og:title", content: "Ordem de serviço do SNOC" },
       { property: "og:description", content: "Registro auditável de execução com evidência fotográfica." },

@@ -26,7 +26,7 @@ import type { ChamadoItsm } from "@/lib/invgate.functions";
 export const Route = createFileRoute("/_authenticated/atividades/")({
   head: () => ({
     meta: [
-      { title: "Atividades e ordens de serviço | SNOC OPS" },
+      { title: "Atividades e ordens de serviço | SNOC" },
       {
         name: "description",
         content:

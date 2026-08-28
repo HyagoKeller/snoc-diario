@@ -17,12 +17,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
     meta: [
-      { title: "Administração | SNOC OPS" },
+      { title: "Administração | SNOC" },
       {
         name: "description",
         content: "Papéis de usuário, regras de escalonamento, disparos registrados e log de auditoria.",
       },
-      { property: "og:title", content: "Administração do SNOC OPS" },
+      { property: "og:title", content: "Administração do SNOC" },
       { property: "og:description", content: "Configuração de papéis, notificações e auditoria." },
     ],
   }),

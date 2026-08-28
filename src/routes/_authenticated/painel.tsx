@@ -21,7 +21,7 @@ import { CRITICIDADE_LABEL, fmtDate, fmtDateTime, minutosEntre, turnoAtual } fro
 export const Route = createFileRoute("/_authenticated/painel")({
   head: () => ({
     meta: [
-      { title: "Painel operacional | SNOC OPS" },
+      { title: "Painel operacional | SNOC" },
       {
         name: "description",
         content: "Fila do turno, indicadores de não conformidade, SLA de passagem de turno e terceiros em campo.",

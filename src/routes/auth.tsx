@@ -13,9 +13,9 @@ export const Route = createFileRoute("/auth")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Entrar | SNOC OPS" },
+      { title: "Entrar | SNOC" },
       { name: "description", content: "Acesso dos operadores e gestores do SNOC ao sistema." },
-      { property: "og:title", content: "Entrar no SNOC OPS" },
+      { property: "og:title", content: "Entrar no SNOC" },
       { property: "og:description", content: "Autenticação da equipe do Network Operations Center." },
     ],
   }),
@@ -75,7 +75,7 @@ function AuthPage() {
             <Activity className="size-5" />
           </div>
           <div>
-            <p className="font-display text-lg leading-none font-bold">SNOC OPS</p>
+            <p className="font-display text-lg leading-none font-bold">SNOC</p>
             <p className="label-mono">DTI-AGU</p>
           </div>
         </Link>
