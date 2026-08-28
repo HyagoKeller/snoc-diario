@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { ExternalLink, Search, Ticket } from "lucide-react";
+import { ExternalLink, Plus, Search, Ticket, X } from "lucide-react";
 import { toast } from "sonner";
 import { buscarChamadoItsm, type ChamadoItsm } from "@/lib/invgate.functions";
 import { Button } from "@/components/ui/button";
@@ -104,6 +104,133 @@ export function ChamadoItsmField({
         </Button>
       </div>
       {cache ? <ChamadoItsmCard numero={cache.numero} cache={cache} /> : null}
+    </div>
+  );
+}
+
+/** Lista de chamados ITSM vinculados (somente leitura). */
+export function ChamadosItsmLista({
+  numeros,
+  cache,
+}: {
+  numeros?: string[] | null;
+  cache?: unknown;
+}) {
+  const lista = numeros ?? [];
+  const cs = (Array.isArray(cache) ? cache : []) as ChamadoItsm[];
+  if (lista.length === 0) return null;
+  return (
+    <div className="space-y-2">
+      {lista.map((n) => (
+        <ChamadoItsmCard key={n} numero={n} cache={cs.find((c) => c.numero === n) ?? null} />
+      ))}
+    </div>
+  );
+}
+
+/**
+ * Campo para vincular vários números de chamado ao mesmo registro.
+ * Cada número pode ser consultado no InvGate; o cache é guardado por chamado.
+ */
+export function ChamadosItsmMulti({
+  numeros,
+  onNumeros,
+  caches,
+  onCaches,
+  label = "Chamados ITSM vinculados (InvGate)",
+}: {
+  numeros: string[];
+  onNumeros: (v: string[]) => void;
+  caches: ChamadoItsm[];
+  onCaches: (v: ChamadoItsm[]) => void;
+  label?: string;
+}) {
+  const buscar = useServerFn(buscarChamadoItsm);
+  const [novo, setNovo] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  async function adicionar() {
+    const numero = novo.trim();
+    if (!numero) {
+      toast.error("Informe o número do chamado.");
+      return;
+    }
+    if (numeros.includes(numero)) {
+      toast.warning("Esse chamado já está vinculado.");
+      return;
+    }
+    onNumeros([...numeros, numero]);
+    setNovo("");
+    setBusy(true);
+    try {
+      const r = await buscar({ data: { numero } });
+      if (r.ok) {
+        onCaches([...caches.filter((c) => c.numero !== r.chamado.numero), r.chamado]);
+        toast.success(`Chamado ${r.chamado.numero} vinculado.`);
+      } else {
+        toast.warning(`${numero}: ${r.erro}`);
+      }
+    } catch {
+      toast.warning(`${numero} vinculado sem dados do InvGate.`);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function remover(numero: string) {
+    onNumeros(numeros.filter((n) => n !== numero));
+    onCaches(caches.filter((c) => c.numero !== numero));
+  }
+
+  return (
+    <div className="space-y-2">
+      <Label>{label}</Label>
+      <div className="flex gap-2">
+        <Input
+          value={novo}
+          onChange={(e) => setNovo(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              void adicionar();
+            }
+          }}
+          placeholder="Ex.: 48213 — pressione Adicionar para incluir outro"
+        />
+        <Button type="button" variant="outline" onClick={() => void adicionar()} disabled={busy}>
+          <Plus className="size-4" /> Adicionar
+        </Button>
+      </div>
+      {numeros.length > 0 ? (
+        <div className="flex flex-wrap gap-2 pt-1">
+          {numeros.map((n) => {
+            const c = caches.find((x) => x.numero === n);
+            return (
+              <span
+                key={n}
+                className="inline-flex items-center gap-2 rounded-full border border-border bg-surface/60 px-3 py-1 text-xs"
+              >
+                <Ticket className="size-3 text-primary" />
+                {n}
+                {c?.status ? <span className="text-muted-foreground">· {c.status}</span> : null}
+                <button
+                  type="button"
+                  aria-label={`Remover chamado ${n}`}
+                  onClick={() => remover(n)}
+                  className="text-muted-foreground hover:text-critico"
+                >
+                  <X className="size-3" />
+                </button>
+              </span>
+            );
+          })}
+        </div>
+      ) : (
+        <p className="text-xs text-muted-foreground">
+          Nenhum chamado adicional vinculado. Use este campo quando o registro atender a mais de um
+          chamado.
+        </p>
+      )}
     </div>
   );
 }
