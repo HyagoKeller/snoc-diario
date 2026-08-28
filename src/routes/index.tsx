@@ -67,10 +67,10 @@ function Landing() {
           <div className="faixa-gov" />
           <div className="space-y-3 p-5">
             <p className="text-sm font-semibold">Acesso institucional</p>
-            <Button asChild className="w-full">
+<Button asChild className="w-full">
               <Link to={session ? "/painel" : "/auth"}>
                 <LogIn className="size-4" />
-                {session ? "Abrir painel" : "Entrar"}
+                {session ? "Acessar diário de bordo" : "Entrar"}
               </Link>
             </Button>
             <Link
