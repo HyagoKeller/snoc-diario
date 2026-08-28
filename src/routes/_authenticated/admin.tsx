@@ -60,6 +60,10 @@ function Admin() {
   const [grupos, setGrupos] = useState<Record<string, string>>({});
   const [coords, setCoords] = useState<Record<string, string>>({});
   const [baseUrl, setBaseUrl] = useState("");
+  const [spSite, setSpSite] = useState("");
+  const [spBiblioteca, setSpBiblioteca] = useState("");
+  const [spPasta, setSpPasta] = useState("SNOC");
+  const [spBusy, setSpBusy] = useState(false);
 
   const { data } = useQuery({
     queryKey: ["admin"],
@@ -79,7 +83,7 @@ function Admin() {
         supabase.from("regras_escalonamento").select("*").order("evento").order("nivel"),
         supabase.from("notificacoes").select("*").order("enviado_em", { ascending: false }).limit(100),
         supabase.from("auditoria").select("*").order("created_at", { ascending: false }).limit(100),
-        supabase.from("integracoes_config").select("*").eq("chave", "invgate_base_url").maybeSingle(),
+        supabase.from("integracoes_config").select("*"),
         supabase.from("turnos_equipe").select("*").order("turno"),
         supabase.from("turno_membros").select("*").order("ordem"),
       ]);
@@ -89,7 +93,8 @@ function Admin() {
         regras: regras ?? [],
         notifs: notifs ?? [],
         auditoria: aud ?? [],
-        integracoes: integ ?? null,
+        integracoes: (integ ?? []).find((i) => i.chave === "invgate_base_url") ?? null,
+        configs: integ ?? [],
         turnos: turnos ?? [],
         membros: membros ?? [],
       };
@@ -102,6 +107,60 @@ function Admin() {
   useEffect(() => {
     if (data?.integracoes) setBaseUrl(data.integracoes.valor);
   }, [data?.integracoes]);
+
+  useEffect(() => {
+    const cfgs = data?.configs ?? [];
+    const v = (chave: string) => cfgs.find((c) => c.chave === chave)?.valor ?? "";
+    if (v("sharepoint_site_url")) setSpSite(v("sharepoint_site_url"));
+    if (v("sharepoint_biblioteca")) setSpBiblioteca(v("sharepoint_biblioteca"));
+    if (v("sharepoint_pasta_raiz")) setSpPasta(v("sharepoint_pasta_raiz"));
+  }, [data?.configs]);
+
+  async function salvarChave(chave: string, valor: string) {
+    const existe = (data?.configs ?? []).some((c) => c.chave === chave);
+    const { error } = existe
+      ? await supabase.from("integracoes_config").update({ valor }).eq("chave", chave)
+      : await supabase.from("integracoes_config").insert({ chave, valor });
+    if (error) throw new Error(error.message);
+  }
+
+  async function salvarSharepoint() {
+    if (!spSite.trim()) {
+      toast.error("Informe a URL do site do SharePoint.");
+      return;
+    }
+    setSpBusy(true);
+    try {
+      await salvarChave("sharepoint_site_url", spSite.trim().replace(/\/+$/, ""));
+      await salvarChave("sharepoint_biblioteca", spBiblioteca.trim());
+      await salvarChave("sharepoint_pasta_raiz", spPasta.trim().replace(/^\/+|\/+$/g, "") || "SNOC");
+      await registrarAuditoria("atualizar_integracao", "integracoes_config", null, {
+        chave: "sharepoint",
+      });
+      toast.success("Destino do SharePoint salvo");
+      qc.invalidateQueries({ queryKey: ["admin"] });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Falha ao salvar");
+    } finally {
+      setSpBusy(false);
+    }
+  }
+
+  async function testarConexaoSharepoint() {
+    setSpBusy(true);
+    try {
+      const r = await testarSp({});
+      if (r.ok) {
+        toast.success(`Conectado: ${r.biblioteca} · pasta atual ${r.pastaBase}`);
+      } else {
+        toast.error(r.erro);
+      }
+    } catch {
+      toast.error("Não foi possível testar a conexão agora.");
+    } finally {
+      setSpBusy(false);
+    }
+  }
 
   useEffect(() => {
     if (!data?.turnos) return;
@@ -549,6 +608,55 @@ function Admin() {
             </div>
             <p className="text-xs text-muted-foreground">
               Atualizado {fmtDateTime(data?.integracoes?.updated_at)}.
+            </p>
+          </section>
+
+          <section className="panel space-y-4 p-5">
+            <h2 className="text-base font-semibold">SharePoint (armazenamento de arquivos)</h2>
+            <p className="text-sm text-muted-foreground">
+              Evidências, laudos e notas fiscais podem ser gravados direto na biblioteca do
+              SharePoint da AGU. O sistema cria automaticamente a estrutura{" "}
+              <code>pasta base / ano / mês</code> — o ano nunca se repete e cada mês recebe sua
+              subpasta. Tenant, client id e client secret do aplicativo Entra ID ficam guardados
+              como segredos do servidor e nunca aparecem nesta tela.
+            </p>
+            <div className="grid gap-4 lg:grid-cols-3">
+              <div className="space-y-2 lg:col-span-2">
+                <Label>URL do site</Label>
+                <Input
+                  value={spSite}
+                  onChange={(e) => setSpSite(e.target.value)}
+                  placeholder="https://agu.sharepoint.com/sites/DTI-CSI"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Biblioteca de documentos</Label>
+                <Input
+                  value={spBiblioteca}
+                  onChange={(e) => setSpBiblioteca(e.target.value)}
+                  placeholder="Documentos (vazio = biblioteca padrão)"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Pasta base</Label>
+                <Input
+                  value={spPasta}
+                  onChange={(e) => setSpPasta(e.target.value)}
+                  placeholder="SNOC/Evidencias"
+                />
+              </div>
+              <div className="flex items-end gap-2 lg:col-span-2">
+                <Button onClick={salvarSharepoint} disabled={spBusy}>
+                  Salvar destino
+                </Button>
+                <Button variant="outline" onClick={testarConexaoSharepoint} disabled={spBusy}>
+                  Testar conexão
+                </Button>
+              </div>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Exemplo do caminho gerado hoje: {spPasta || "SNOC"}/{new Date().getFullYear()}/
+              {String(new Date().getMonth() + 1).padStart(2, "0")}-mês.
             </p>
           </section>
         </TabsContent>
