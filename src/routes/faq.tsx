@@ -54,11 +54,18 @@ const MODULOS = [
   },
 ];
 
+const NUMEROS = [
+  { valor: "6 seções", texto: "Checklist oficial de ronda" },
+  { valor: "15 min", texto: "Prazo de aceite do turno" },
+  { valor: "5 anos", texto: "Retenção de evidências" },
+];
+
 const PERGUNTAS = [
   {
     q: "Quem pode acessar o sistema?",
-    a: "Operador SNOC vê a fila do turno: rondas pendentes, aceite de passagem, terceiros em campo e suas OS. Gestor AGU vê indicadores consolidados e relatórios. Super Admin administra papéis, regras de escalonamento e destinatários. Novos cadastros entram como Operador até a chefia ajustar o papel.",
+    a: "O perfil de acesso é atribuído automaticamente conforme os grupos do Active Directory (AD) do usuário. Operador SNOC vê a fila do turno: rondas pendentes, aceite de passagem, terceiros em campo e suas OS. Gestor AGU vê indicadores consolidados e relatórios. Super Admin administra regras de escalonamento e destinatários.",
   },
+
   {
     q: "Por que a foto é obrigatória em não conformidade?",
     a: "A evidência fotográfica substitui o formulário em papel e sustenta o registro em auditoria. Sem a foto, o item não conforme não pode ser finalizado na ronda.",
