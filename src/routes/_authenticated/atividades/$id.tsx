@@ -230,6 +230,9 @@ function DetalheOS() {
             <ChamadoItsmCard numero={a.chamado_itsm} cache={a.chamado_itsm_cache} />
           </div>
         ) : null}
+        <div className="mt-3">
+          <ChamadosItsmLista numeros={a.chamados_itsm} cache={a.chamados_itsm_cache} />
+        </div>
         {a.descricao ? <p className="mt-4 text-sm text-muted-foreground">{a.descricao}</p> : null}
       </header>
 
