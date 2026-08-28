@@ -161,11 +161,24 @@ function NovaRonda() {
           `[SNOC] NC CRÍTICA na ronda de ${new Date().toLocaleDateString("pt-BR")}`,
           `Ronda ${turno} em ${localidade} registrada por ${profile?.nome ?? "operador"} com NC crítica nas seções: ${secoesCriticas.join(", ")}. Total de NC: ${totalNC}. Abrir fila de incidente.`,
           { tipo: "ronda", id: ronda.id },
+          [],
+          { criticidade: "critica", turno },
         );
         toast.warning(
           enviados
             ? `NC crítica registrada — ${enviados} destinatário(s) notificado(s).`
             : "NC crítica registrada. Nenhuma regra de escalonamento cadastrada para este evento.",
+        );
+      }
+
+      if (totalNC > 0) {
+        await dispararNotificacao(
+          "ronda_nc",
+          `[SNOC] Ronda com ${totalNC} não conformidade(s) — ${turno}`,
+          `Ronda ${turno} em ${localidade} registrada por ${profile?.nome ?? "operador"} com ${totalNC} não conformidade(s).`,
+          { tipo: "ronda", id: ronda.id },
+          [],
+          { criticidade: secoesCriticas.length ? "critica" : "media", turno },
         );
       }
 

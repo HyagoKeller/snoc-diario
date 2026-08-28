@@ -12,6 +12,7 @@ import {
   CRITICIDADE_LABEL,
   criticidadeToken,
   fmtDateTime,
+  turnoAtual,
   type Criticidade,
 } from "@/lib/snoc";
 import { Button } from "@/components/ui/button";
@@ -127,6 +128,21 @@ O acesso físico exige check-in no SNOC vinculado a esta OS, com evidência foto
           .update({ email_enviado_em: new Date().toISOString() })
           .eq("id", a.id);
       }
+      if (tipo === "troca_peca" || tipo === "instalacao") {
+        await dispararNotificacao(
+          tipo === "troca_peca" ? "saida_equipamento" : "entrada_equipamento",
+          `[SNOC] ${tipo === "troca_peca" ? "Saída/troca" : "Entrada/instalação"} de equipamento — OS #${a.codigo}`,
+          `OS #${a.codigo} registra ${tipo === "troca_peca" ? "saída/troca" : "entrada/instalação"} de equipamento.
+Ativo: ${ativo || "não informado"}
+Fornecedor: ${forn?.razao_social ?? "não informado"}
+Criticidade: ${CRITICIDADE_LABEL[criticidade]}
+Aberta por ${profile?.nome ?? "SNOC"}.`,
+          { tipo: "atividade", id: a.id },
+          [],
+          { criticidade, turno: turnoAtual() },
+        );
+      }
+
       await registrarAuditoria("abrir_os", "atividades", a.id, { codigo: a.codigo });
       toast.success(
         enviados
