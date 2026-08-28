@@ -43,9 +43,11 @@ function Landing() {
       </header>
 
       <section className="mx-auto flex w-full max-w-5xl flex-1 flex-col items-center justify-center px-6 py-14 text-center">
-        <div className="flex size-14 items-center justify-center rounded-md bg-primary/15 text-primary">
-          <Activity className="size-7" />
-        </div>
+<img
+          src={aguServicosLogo.url}
+          alt="AGU Serviços"
+          className="h-20 w-auto sm:h-24"
+        />
 
         <p className="label-mono mt-6">Secretaria de Governança e Gestão Estratégica</p>
         <p className="label-mono">DTI — Coordenação de Segurança da Informação</p>
