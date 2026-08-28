@@ -18,7 +18,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 export const Route = createFileRoute("/_authenticated/passagens")({
   head: () => ({
     meta: [
-      { title: "Passagem de turno | SNOC OPS" },
+      { title: "Passagem de turno | SNOC" },
       {
         name: "description",
         content: "Passagem de turno formalizada com prazo de aceite e escalonamento automático para a chefia.",

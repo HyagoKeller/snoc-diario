@@ -20,7 +20,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 export const Route = createFileRoute("/_authenticated/terceiros")({
   head: () => ({
     meta: [
-      { title: "Controle de acesso de terceiros | SNOC OPS" },
+      { title: "Controle de acesso de terceiros | SNOC" },
       {
         name: "description",
         content: "Check-in e check-out de fornecedores amarrado a uma OS, com foto de documento e acompanhante interno.",

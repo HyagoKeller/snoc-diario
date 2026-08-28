@@ -5,13 +5,13 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 export const Route = createFileRoute("/faq")({
   head: () => ({
     meta: [
-      { title: "Perguntas frequentes | SNOC OPS" },
+      { title: "Perguntas frequentes | SNOC" },
       {
         name: "description",
         content:
-          "O que o SNOC OPS registra: rondas com evidência fotográfica, passagem de turno com prazo de aceite, acesso de terceiros e ordens de serviço, papéis de acesso e tratamento de dados.",
+          "O que o SNOC registra: rondas com evidência fotográfica, passagem de turno com prazo de aceite, acesso de terceiros e ordens de serviço, papéis de acesso e tratamento de dados.",
       },
-      { property: "og:title", content: "Perguntas frequentes do SNOC OPS" },
+      { property: "og:title", content: "Perguntas frequentes do SNOC" },
       {
         property: "og:description",
         content: "Módulos, papéis de acesso, prazos de escalonamento e tratamento de dados pessoais.",
@@ -84,7 +84,7 @@ const PERGUNTAS = [
   },
   {
     q: "Esqueci a senha ou preciso de suporte. Onde recorro?",
-    a: "Abra chamado no AGU Serviços para a DTI, indicando SNOC OPS e o e-mail institucional utilizado no acesso.",
+    a: "Abra chamado no AGU Serviços para a DTI, indicando SNOC e o e-mail institucional utilizado no acesso.",
   },
 ];
 
@@ -152,7 +152,7 @@ function Faq() {
 
       <footer className="border-t border-border py-6">
         <p className="mx-auto max-w-3xl px-6 text-xs text-muted-foreground">
-          SNOC OPS · DTI-AGU. Suporte pelo AGU Serviços.
+          SNOC · DTI-AGU. Suporte pelo AGU Serviços.
         </p>
       </footer>
     </main>

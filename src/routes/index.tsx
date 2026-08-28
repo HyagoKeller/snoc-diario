@@ -7,13 +7,13 @@ import aguLogo from "@/assets/agu.png.asset.json";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "SNOC OPS | Acesso institucional — DTI-AGU" },
+      { title: "SNOC | Acesso institucional — DTI-AGU" },
       {
         name: "description",
         content:
           "Diário de bordo operacional do SNOC da AGU: rondas, passagem de turno, gestão de acesso de terceiros e ordens de serviço. Acesso restrito à equipe do SNOC.",
       },
-      { property: "og:title", content: "SNOC OPS — acesso institucional" },
+      { property: "og:title", content: "SNOC — acesso institucional" },
       {
         property: "og:description",
         content: "Diário de bordo operacional do SNOC. Acesso restrito e monitorado.",
@@ -90,7 +90,7 @@ function Landing() {
       <footer className="border-t border-border py-6">
         <div className="mx-auto max-w-5xl space-y-1 px-6 text-xs text-muted-foreground">
           <p>
-            SNOC OPS · DTI-AGU. Dados pessoais de terceiros tratados conforme a LGPD, com
+            SNOC · DTI-AGU. Dados pessoais de terceiros tratados conforme a LGPD, com
             consentimento registrado no check-in.
           </p>
           <p className="opacity-60">Desenvolvido por Hyago Keller.</p>

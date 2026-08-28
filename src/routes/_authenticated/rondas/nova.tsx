@@ -33,7 +33,7 @@ import { fmtDate } from "@/lib/snoc";
 export const Route = createFileRoute("/_authenticated/rondas/nova")({
   head: () => ({
     meta: [
-      { title: "Nova ronda | SNOC OPS" },
+      { title: "Nova ronda | SNOC" },
       { name: "description", content: "Registro de ronda operacional com evidência fotográfica por item." },
       { property: "og:title", content: "Nova ronda operacional" },
       { property: "og:description", content: "Checklist digital do Data Center com foto obrigatória em NC." },

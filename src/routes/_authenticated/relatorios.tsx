@@ -16,7 +16,7 @@ import { Badge } from "@/components/ui/badge";
 export const Route = createFileRoute("/_authenticated/relatorios")({
   head: () => ({
     meta: [
-      { title: "Relatórios mensais | SNOC OPS" },
+      { title: "Relatórios mensais | SNOC" },
       {
         name: "description",
         content: "Fechamento mensal consolidado de rondas, passagem de turno, terceiros e ordens de serviço.",

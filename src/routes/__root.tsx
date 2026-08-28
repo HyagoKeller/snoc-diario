@@ -19,7 +19,7 @@ function NotFoundComponent() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
-        <p className="label-mono">SNOC OPS</p>
+        <p className="label-mono">SNOC</p>
         <h1 className="mt-2 text-7xl font-bold text-foreground">404</h1>
         <h2 className="mt-4 text-xl font-semibold text-foreground">Página não encontrada</h2>
         <p className="mt-2 text-sm text-muted-foreground">
@@ -81,14 +81,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "SNOC OPS | Operação do Data Center" },
+      { title: "SNOC | Operação do Data Center" },
       {
         name: "description",
         content:
           "Plataforma unificada de rondas, passagem de turno, acesso de terceiros e ordens de serviço do SNOC.",
       },
       { name: "author", content: "DTI-AGU" },
-      { property: "og:title", content: "SNOC OPS" },
+      { property: "og:title", content: "SNOC" },
       { property: "og:description", content: "Operação unificada do Network Operations Center." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

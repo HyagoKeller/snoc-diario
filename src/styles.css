@@ -5,7 +5,7 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * SNOC OPS — design system.
+ * SNOC — design system.
  * Console de operação 24/7: fundo grafite-azulado, acento ciano/turquesa,
  * escala de severidade (ok / atencao / alto / critico).
  * Todas as cores em oklch e sempre via tokens semânticos.

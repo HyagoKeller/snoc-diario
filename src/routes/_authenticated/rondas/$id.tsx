@@ -11,7 +11,7 @@ import { ChamadoItsmCard } from "@/components/ChamadoItsmField";
 export const Route = createFileRoute("/_authenticated/rondas/$id")({
   head: () => ({
     meta: [
-      { title: "Detalhe da ronda | SNOC OPS" },
+      { title: "Detalhe da ronda | SNOC" },
       { name: "description", content: "Itens, não conformidades e evidências fotográficas da ronda." },
       { property: "og:title", content: "Detalhe da ronda operacional" },
       { property: "og:description", content: "Registro auditável de uma ronda do Data Center." },

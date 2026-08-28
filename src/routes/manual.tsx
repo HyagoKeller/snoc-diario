@@ -17,13 +17,13 @@ import { Button } from "@/components/ui/button";
 export const Route = createFileRoute("/manual")({
   head: () => ({
     meta: [
-      { title: "Manual de utilização | SNOC OPS" },
+      { title: "Manual de utilização | SNOC" },
       {
         name: "description",
         content:
-          "Manual completo do SNOC OPS: acesso e papéis, rondas com evidência, passagem de turno, acesso de terceiros, ordens de serviço, relatórios, administração e boas práticas.",
+          "Manual completo do SNOC: acesso e papéis, rondas com evidência, passagem de turno, acesso de terceiros, ordens de serviço, relatórios, administração e boas práticas.",
       },
-      { property: "og:title", content: "Manual de utilização do SNOC OPS" },
+      { property: "og:title", content: "Manual de utilização do SNOC" },
       {
         property: "og:description",
         content:
@@ -51,7 +51,7 @@ const SECOES: Secao[] = [
     titulo: "1. Acesso e papéis",
     icon: LogIn,
     resumo:
-      "O SNOC OPS é de uso restrito à operação do Data Center da AGU. O acesso é feito com e-mail institucional e senha, e todo login e ação relevante fica registrado em auditoria.",
+      "O SNOC é de uso restrito à operação do Data Center da AGU. O acesso é feito com e-mail institucional e senha, e todo login e ação relevante fica registrado em auditoria.",
     passos: [
       {
         titulo: "Criar conta",
@@ -283,13 +283,13 @@ function Manual() {
           <Link to="/" className="inline-flex items-center gap-2 text-sm hover:underline">
             <ArrowLeft className="size-4" /> Voltar
           </Link>
-          <span className="text-xs opacity-80">DTI-AGU · SNOC OPS</span>
+          <span className="text-xs opacity-80">DTI-AGU · SNOC</span>
         </div>
       </header>
 
       <main className="mx-auto max-w-4xl px-4 py-10">
         <p className="label-mono">Documentação oficial</p>
-        <h1 className="mt-2 text-3xl font-bold">Manual de utilização do SNOC OPS</h1>
+        <h1 className="mt-2 text-3xl font-bold">Manual de utilização do SNOC</h1>
         <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
           Guia completo da plataforma unificada de rondas, passagem de turno, controle de acesso de
           terceiros e gestão de atividades do Data Center da AGU. Cada seção descreve o passo a passo

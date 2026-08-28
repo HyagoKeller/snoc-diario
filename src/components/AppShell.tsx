@@ -50,7 +50,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <div className="flex items-center gap-3 bg-topbar px-4 py-3 text-topbar-foreground shadow-md">
         <Activity className="size-5 shrink-0" />
         <p className="font-display truncate text-sm font-semibold sm:text-base">
-          SNOC OPS — Diário de Bordo Operacional
+          SNOC — Diário de Bordo Operacional
         </p>
         <span className="ml-auto hidden items-center gap-4 text-xs opacity-90 sm:flex">
           <Link to="/manual" className="hover:underline">
@@ -72,7 +72,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <Activity className="size-5" />
           </div>
           <div>
-            <p className="font-display leading-none font-bold">SNOC OPS</p>
+            <p className="font-display leading-none font-bold">SNOC</p>
             <p className="label-mono">DTI-AGU</p>
           </div>
         </Link>
