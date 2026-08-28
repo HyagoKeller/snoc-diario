@@ -49,7 +49,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     <div className="flex min-h-screen flex-col">
       <div className="faixa-gov" />
       <div className="flex items-center gap-3 bg-topbar px-4 py-3 text-topbar-foreground shadow-md">
-        <Activity className="size-5 shrink-0" />
+        <img src={aguServicosLogo.url} alt="AGU Serviços" className="size-6 shrink-0 rounded-full" />
         <p className="font-display truncate text-sm font-semibold sm:text-base">
           SNOC — Diário de Bordo Operacional
         </p>
