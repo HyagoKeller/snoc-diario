@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Activity, LogIn, Lock, HelpCircle } from "lucide-react";
+import { LogIn, Lock, HelpCircle } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import aguServicosLogo from "@/assets/aguservicos.png.asset.json";
@@ -31,12 +31,7 @@ function Landing() {
       <div className="faixa-gov" />
 
 <header className="border-b border-border">
-        <div className="mx-auto flex max-w-5xl flex-col items-center gap-2 px-6 py-4 text-center">
-          <img
-            src={aguServicosLogo.url}
-            alt="AGU Serviços"
-            className="h-16 w-auto rounded-md bg-white/95 p-2 sm:h-20"
-          />
+        <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-6 py-3">
           <p className="label-mono truncate">Advocacia-Geral da União · SGG · DTI-CSI</p>
           <Link
             to="/faq"
@@ -48,9 +43,11 @@ function Landing() {
       </header>
 
       <section className="mx-auto flex w-full max-w-5xl flex-1 flex-col items-center justify-center px-6 py-14 text-center">
-        <div className="flex size-14 items-center justify-center rounded-md bg-primary/15 text-primary">
-          <Activity className="size-7" />
-        </div>
+<img
+          src={aguServicosLogo.url}
+          alt="AGU Serviços"
+          className="h-20 w-auto sm:h-24"
+        />
 
         <p className="label-mono mt-6">Secretaria de Governança e Gestão Estratégica</p>
         <p className="label-mono">DTI — Coordenação de Segurança da Informação</p>
