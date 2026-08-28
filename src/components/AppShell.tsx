@@ -2,7 +2,6 @@ import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import {
-  Activity,
   ClipboardCheck,
   Repeat2,
   ShieldCheck,
@@ -16,6 +15,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { ROLE_LABEL } from "@/lib/snoc";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import aguServicosLogo from "@/assets/aguservicos.png.asset.json";
 
 const NAV = [
   { to: "/painel", label: "Painel", icon: LayoutDashboard, need: "all" },
@@ -48,7 +48,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     <div className="flex min-h-screen flex-col">
       <div className="faixa-gov" />
       <div className="flex items-center gap-3 bg-topbar px-4 py-3 text-topbar-foreground shadow-md">
-        <Activity className="size-5 shrink-0" />
+        <img src={aguServicosLogo.url} alt="AGU Serviços" className="size-6 shrink-0 rounded-full" />
         <p className="font-display truncate text-sm font-semibold sm:text-base">
           SNOC — Diário de Bordo Operacional
         </p>
@@ -68,8 +68,8 @@ export function AppShell({ children }: { children: ReactNode }) {
 
 
         <Link to="/painel" className="flex items-center gap-3 px-2 py-3">
-          <div className="flex size-9 items-center justify-center rounded-md bg-primary/15 text-primary">
-            <Activity className="size-5" />
+<div className="flex size-10 items-center justify-center overflow-hidden rounded-md bg-primary/15">
+            <img src={aguServicosLogo.url} alt="AGU Serviços" className="size-8 rounded-full" />
           </div>
           <div>
             <p className="font-display leading-none font-bold">SNOC</p>
