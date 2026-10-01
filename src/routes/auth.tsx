@@ -7,7 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Separator } from "@/components/ui/separator";
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
@@ -15,10 +15,6 @@ export const Route = createFileRoute("/auth")({
     meta: [
       { title: "Entrar | SNOC" },
       { name: "description", content: "Acesso dos operadores e gestores do SNOC ao sistema." },
-      { property: "og:title", content: "Entrar no SNOC" },
-      { property: "og:description", content: "Autenticação da equipe do Network Operations Center." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: AuthPage,
@@ -29,12 +25,26 @@ function AuthPage() {
   const { session } = useAuth();
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
-  const [nome, setNome] = useState("");
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
     if (session) navigate({ to: "/painel", replace: true });
   }, [session, navigate]);
+
+  async function entrarComMicrosoft() {
+    setBusy(true);
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "azure",
+      options: {
+        scopes: "openid profile email",
+        redirectTo: window.location.origin + "/auth",
+      },
+    });
+    if (error) {
+      toast.error(error.message);
+      setBusy(false);
+    }
+  }
 
   async function entrar(e: React.FormEvent) {
     e.preventDefault();
@@ -49,30 +59,10 @@ function AuthPage() {
     navigate({ to: "/painel", replace: true });
   }
 
-  async function cadastrar(e: React.FormEvent) {
-    e.preventDefault();
-    setBusy(true);
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password: senha,
-      options: { data: { nome }, emailRedirectTo: window.location.origin },
-    });
-    setBusy(false);
-    if (error) {
-      toast.error(error.message);
-      return;
-    }
-    if (!data.session) {
-      toast.success("Cadastro criado. Confirme o e-mail para acessar.");
-      return;
-    }
-    navigate({ to: "/painel", replace: true });
-  }
-
   return (
     <main className="flex min-h-screen items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
-        <Link to="/" className="mb-8 flex items-center justify-center gap-3">
+        <div className="mb-8 flex items-center justify-center gap-3">
           <div className="flex size-10 items-center justify-center rounded-md bg-primary/15 text-primary">
             <Activity className="size-5" />
           </div>
@@ -80,91 +70,67 @@ function AuthPage() {
             <p className="font-display text-lg leading-none font-bold">SNOC</p>
             <p className="label-mono">DTI-AGU</p>
           </div>
-        </Link>
+        </div>
 
-        <div className="panel p-6">
-          <Tabs defaultValue="entrar">
-            <TabsList className="w-full">
-              <TabsTrigger value="entrar" className="flex-1">
-                Entrar
-              </TabsTrigger>
-              <TabsTrigger value="cadastrar" className="flex-1">
-                Criar acesso
-              </TabsTrigger>
-            </TabsList>
+        <div className="panel space-y-6 p-6">
+          <div className="space-y-2 text-center">
+            <h1 className="text-xl font-bold">Acesso ao Sistema</h1>
+            <p className="text-sm text-muted-foreground">Utilize sua conta institucional da AGU</p>
+          </div>
 
-            <TabsContent value="entrar">
-              <form onSubmit={entrar} className="space-y-4 pt-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email">E-mail institucional</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="nome@agu.gov.br"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="senha">Senha</Label>
-                  <Input
-                    id="senha"
-                    type="password"
-                    required
-                    value={senha}
-                    onChange={(e) => setSenha(e.target.value)}
-                  />
-                </div>
-                <Button type="submit" className="w-full" disabled={busy}>
-                  {busy ? "Verificando…" : "Entrar"}
-                </Button>
-              </form>
-            </TabsContent>
+          <Button 
+            className="w-full" 
+            size="lg" 
+            onClick={entrarComMicrosoft} 
+            disabled={busy}
+          >
+            <img 
+              src="https://www.microsoft.com/favicon.ico" 
+              alt="" 
+              className="mr-2 size-4" 
+            />
+            Entrar com Microsoft 365
+          </Button>
 
-            <TabsContent value="cadastrar">
-              <form onSubmit={cadastrar} className="space-y-4 pt-4">
-                <div className="space-y-2">
-                  <Label htmlFor="nome">Nome completo</Label>
-                  <Input
-                    id="nome"
-                    required
-                    value={nome}
-                    onChange={(e) => setNome(e.target.value)}
-                    placeholder="Nome do operador"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email2">E-mail institucional</Label>
-                  <Input
-                    id="email2"
-                    type="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="senha2">Senha</Label>
-                  <Input
-                    id="senha2"
-                    type="password"
-                    required
-                    minLength={8}
-                    value={senha}
-                    onChange={(e) => setSenha(e.target.value)}
-                  />
-                </div>
-                <Button type="submit" className="w-full" disabled={busy}>
-                  {busy ? "Criando…" : "Criar acesso"}
-                </Button>
-                <p className="text-xs text-muted-foreground">
-                  Novos acessos entram como Operador. O primeiro usuário do sistema recebe Super
-                  Admin para configurar papéis e regras.
-                </p>
-              </form>
-            </TabsContent>
-          </Tabs>
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <Separator />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-card px-2 text-muted-foreground">Ou fallback admin</span>
+            </div>
+          </div>
+
+          <form onSubmit={entrar} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">E-mail</Label>
+              <Input
+                id="email"
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="nome@agu.gov.br"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="senha">Senha</Label>
+              <Input
+                id="senha"
+                type="password"
+                required
+                value={senha}
+                onChange={(e) => setSenha(e.target.value)}
+              />
+            </div>
+            <Button type="submit" variant="outline" className="w-full" disabled={busy}>
+              {busy ? "Verificando…" : "Entrar com e-mail/senha"}
+            </Button>
+          </form>
+
+          <p className="text-center text-xs text-muted-foreground">
+            Novos acessos via Microsoft 365 ficam pendentes de ativação por um gestor.
+          </p>
         </div>
       </div>
     </main>

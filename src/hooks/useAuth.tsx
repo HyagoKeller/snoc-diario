@@ -2,6 +2,8 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from "
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import type { AppRole } from "@/lib/snoc";
+import { turnoAtual } from "@/lib/snoc";
+import { toast } from "sonner";
 
 type Profile = { id: string; nome: string; email: string; grupo_ad: string | null; ativo: boolean };
 
@@ -36,6 +38,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [roles, setRoles] = useState<AppRole[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentShift, setCurrentShift] = useState<string>(turnoAtual());
+
+  const signOut = async () => {
+    await supabase.auth.signOut();
+    setSession(null);
+    setProfile(null);
+    setRoles([]);
+  };
 
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((_event, s) => {
@@ -62,13 +72,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         supabase.from("user_roles").select("role").eq("user_id", uid),
       ]);
       if (!alive) return;
-      setProfile((p as Profile) ?? null);
+      
+      const userProfile = p as Profile;
+      if (userProfile && !userProfile.ativo) {
+        toast.error("Sua conta está aguardando ativação por um gestor.");
+        await signOut();
+        return;
+      }
+
+      setProfile(userProfile ?? null);
       setRoles(((r ?? []) as { role: AppRole }[]).map((x) => x.role));
     })();
     return () => {
       alive = false;
     };
   }, [session?.user?.id]);
+
+  // Shift boundary logout logic
+  useEffect(() => {
+    if (!session) return;
+
+    const interval = setInterval(() => {
+      const nowShift = turnoAtual();
+      if (nowShift !== currentShift) {
+        toast.info("Fim do turno atingido. Por segurança, sua sessão foi encerrada.");
+        signOut();
+        setCurrentShift(nowShift);
+      }
+    }, 60000); // Check every minute
+
+    return () => clearInterval(interval);
+  }, [session, currentShift]);
 
   const role = PRIORITY.find((p) => roles.includes(p)) ?? null;
 
@@ -81,9 +115,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isManager: roles.includes("gestor") || roles.includes("super_admin"),
     isAdmin: roles.includes("super_admin"),
     loading,
-    signOut: async () => {
-      await supabase.auth.signOut();
-    },
+    signOut,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
