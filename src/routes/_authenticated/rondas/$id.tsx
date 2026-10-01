@@ -12,7 +12,7 @@ export const Route = createFileRoute("/_authenticated/rondas/$id")({
   head: () => ({
     meta: [
       { title: "Detalhe da ronda | SNOC" },
-      { name: "description", content: "Itens, não conformidades e evidências fotográficas da ronda." },
+      { name: "description", content: "Itens, não conformidades e evidências em foto ou vídeo da ronda." },
       { property: "og:title", content: "Detalhe da ronda operacional" },
       { property: "og:description", content: "Registro auditável de uma ronda do Data Center." },
     ],

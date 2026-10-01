@@ -9,7 +9,7 @@ export const Route = createFileRoute("/faq")({
       {
         name: "description",
         content:
-          "O que o SNOC registra: rondas com evidência fotográfica, passagem de turno com prazo de aceite, acesso de terceiros e ordens de serviço, papéis de acesso e tratamento de dados.",
+          "O que o SNOC registra: rondas com foto ou vídeo, passagem de turno, acesso de terceiros e ordens de serviço.",
       },
       { property: "og:title", content: "Perguntas frequentes do SNOC" },
       {

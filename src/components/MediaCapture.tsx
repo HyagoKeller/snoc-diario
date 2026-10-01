@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 
 type MediaCaptureProps = {
   id: string;
-  file?: File;
+  file?: File | undefined;
   onFile: (file: File | undefined) => void;
   allowVideo?: boolean;
   allowFiles?: boolean;

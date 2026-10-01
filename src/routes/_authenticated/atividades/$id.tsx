@@ -28,7 +28,7 @@ export const Route = createFileRoute("/_authenticated/atividades/$id")({
       { title: "Ordem de serviço | SNOC" },
       { name: "description", content: "Evidências antes/depois, laudo do fornecedor e fechamento da OS." },
       { property: "og:title", content: "Ordem de serviço do SNOC" },
-      { property: "og:description", content: "Registro auditável de execução com evidência fotográfica." },
+      { property: "og:description", content: "Registro auditável de execução com foto ou vídeo." },
     ],
   }),
   component: DetalheOS,
@@ -131,7 +131,7 @@ function DetalheOS() {
     const temAntes = evidencias.some((e) => e.tipo === "antes");
     const temDepois = evidencias.some((e) => e.tipo === "depois");
     if (!temAntes || !temDepois) {
-      toast.error("A OS só pode ser fechada com evidência fotográfica antes e depois.");
+      toast.error("A OS só pode ser fechada com evidência visual antes e depois.");
       return;
     }
     const semCheckout = (data?.visitas ?? []).some((v) => !v.checkout_em);
