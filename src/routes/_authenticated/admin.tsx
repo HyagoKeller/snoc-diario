@@ -50,7 +50,7 @@ const EVENTOS = [
 ];
 
 function Admin() {
-  const { isAdmin } = useAuth();
+  const { isManager, isAdmin } = useAuth();
   const qc = useQueryClient();
   const [evento, setEvento] = useState(EVENTOS[0]!.valor);
   const [prazo, setPrazo] = useState("15");
@@ -257,6 +257,10 @@ function Admin() {
   }
 
   async function definirPapel(userId: string, role: AppRole) {
+    if (role === "super_admin" && !isAdmin) {
+      toast.error("Somente o Super Admin pode atribuir esse papel.");
+      return;
+    }
     const atuais = papeis.filter((p) => p.user_id === userId);
     for (const a of atuais) await supabase.from("user_roles").delete().eq("id", a.id);
     const { error } = await supabase.from("user_roles").insert({ user_id: userId, role });
@@ -264,6 +268,7 @@ function Admin() {
       toast.error(error.message);
       return;
     }
+    await supabase.from("profiles").update({ ativo: true }).eq("id", userId);
     await registrarAuditoria("definir_papel", "user_roles", userId, { role });
     toast.success(`Papel atualizado para ${ROLE_LABEL[role]}`);
     qc.invalidateQueries({ queryKey: ["admin"] });
@@ -309,8 +314,8 @@ function Admin() {
     qc.invalidateQueries({ queryKey: ["admin"] });
   }
 
-  if (!isAdmin) {
-    return <p className="panel p-6 text-sm text-muted-foreground">Área restrita ao Super Admin.</p>;
+  if (!isManager) {
+    return <p className="panel p-6 text-sm text-muted-foreground">Área restrita a gestores.</p>;
   }
 
   return (
@@ -326,11 +331,11 @@ function Admin() {
       <Tabs defaultValue="usuarios">
         <TabsList>
           <TabsTrigger value="usuarios">Usuários e papéis</TabsTrigger>
-          <TabsTrigger value="turnos">Turnos e equipes</TabsTrigger>
-          <TabsTrigger value="regras">Notificações</TabsTrigger>
-          <TabsTrigger value="disparos">Disparos</TabsTrigger>
-          <TabsTrigger value="auditoria">Auditoria</TabsTrigger>
-          <TabsTrigger value="integracoes">Integrações</TabsTrigger>
+          {isAdmin ? <TabsTrigger value="turnos">Turnos e equipes</TabsTrigger> : null}
+          {isAdmin ? <TabsTrigger value="regras">Notificações</TabsTrigger> : null}
+          {isAdmin ? <TabsTrigger value="disparos">Disparos</TabsTrigger> : null}
+          {isAdmin ? <TabsTrigger value="auditoria">Auditoria</TabsTrigger> : null}
+          {isAdmin ? <TabsTrigger value="integracoes">Integrações</TabsTrigger> : null}
         </TabsList>
 
         <TabsContent value="usuarios" className="pt-4">
@@ -350,14 +355,14 @@ function Admin() {
                       {p.ativo ? "Ativo" : "Inativo"}
                     </Badge>
                     <Select
-                      value={papel ?? "operador"}
+                      value={papel ?? ""}
                       onValueChange={(v) => definirPapel(p.id, v as AppRole)}
                     >
                       <SelectTrigger className="w-44">
-                        <SelectValue />
+                        <SelectValue placeholder="Atribuir papel" />
                       </SelectTrigger>
                       <SelectContent>
-                        {(["operador", "gestor", "super_admin"] as AppRole[]).map((r) => (
+                        {(["operador", "gestor", ...(isAdmin ? ["super_admin" as const] : [])] as AppRole[]).map((r) => (
                           <SelectItem key={r} value={r}>
                             {ROLE_LABEL[r]}
                           </SelectItem>
@@ -373,13 +378,13 @@ function Admin() {
             })}
           </div>
           <p className="mt-3 text-xs text-muted-foreground">
-            O campo “grupo AD” prepara o mapeamento automático de papéis quando o login federado
-            (Entra ID) for habilitado: cada grupo do AD passa a definir o papel, sem manutenção
-            manual.
+             No primeiro acesso com a conta Microsoft 365, o usuário fica pendente. Um Gestor ou
+             Super Admin atribui o papel e libera o acesso; somente o Super Admin pode conceder esse
+             mesmo nível de administração.
           </p>
         </TabsContent>
 
-        <TabsContent value="turnos" className="space-y-4 pt-4">
+        <TabsContent value="turnos" className={isAdmin ? "space-y-4 pt-4" : "hidden"}>
           <p className="text-sm text-muted-foreground">
             Cada turno recebe um grupo do Active Directory (origem dos técnicos) e os e-mails dos
             coordenadores que devem ser avisados. A passagem de turno é enviada ao primeiro técnico
@@ -464,7 +469,7 @@ function Admin() {
           })}
         </TabsContent>
 
-        <TabsContent value="regras" className="space-y-4 pt-4">
+        <TabsContent value="regras" className={isAdmin ? "space-y-4 pt-4" : "hidden"}>
           <section className="panel space-y-4 p-5">
             <h2 className="text-base font-semibold">Nova regra</h2>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -577,7 +582,7 @@ function Admin() {
           </div>
         </TabsContent>
 
-        <TabsContent value="disparos" className="pt-4">
+        <TabsContent value="disparos" className={isAdmin ? "pt-4" : "hidden"}>
           <div className="panel divide-y divide-border">
             {(data?.notifs ?? []).map((n) => (
               <div key={n.id} className="p-4">
@@ -593,7 +598,7 @@ function Admin() {
           </div>
         </TabsContent>
 
-        <TabsContent value="auditoria" className="pt-4">
+        <TabsContent value="auditoria" className={isAdmin ? "pt-4" : "hidden"}>
           <div className="panel divide-y divide-border">
             {(data?.auditoria ?? []).map((a) => (
               <div key={a.id} className="p-4 text-sm">
@@ -612,7 +617,7 @@ function Admin() {
           </div>
         </TabsContent>
 
-        <TabsContent value="integracoes" className="space-y-4 pt-4">
+        <TabsContent value="integracoes" className={isAdmin ? "space-y-4 pt-4" : "hidden"}>
           <section className="panel space-y-4 p-5">
             <h2 className="text-base font-semibold">InvGate (Service Desk / ITSM)</h2>
             <p className="text-sm text-muted-foreground">

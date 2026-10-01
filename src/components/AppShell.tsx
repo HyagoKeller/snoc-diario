@@ -24,7 +24,7 @@ const NAV = [
   { to: "/terceiros", label: "Terceiros", icon: ShieldCheck, need: "all" },
   { to: "/atividades", label: "Atividades / OS", icon: Wrench, need: "all" },
   { to: "/relatorios", label: "Relatórios", icon: FileText, need: "manager" },
-  { to: "/admin", label: "Administração", icon: Settings, need: "admin" },
+  { to: "/admin", label: "Administração", icon: Settings, need: "manager" },
 ] as const;
 
 export function AppShell({ children }: { children: ReactNode }) {
@@ -34,14 +34,14 @@ export function AppShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   const items = NAV.filter(
-    (i) => i.need === "all" || (i.need === "manager" && isManager) || (i.need === "admin" && isAdmin),
+    (i) => i.need === "all" || (i.need === "manager" && isManager),
   );
 
   async function sair() {
     await queryClient.cancelQueries();
     queryClient.clear();
     await signOut();
-    navigate({ to: "/auth", replace: true });
+    navigate({ to: "/", replace: true });
   }
 
   return (

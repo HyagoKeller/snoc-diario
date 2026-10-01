@@ -65,7 +65,11 @@ const NUMEROS = [
 const PERGUNTAS = [
   {
     q: "Quem pode acessar o sistema?",
-    a: "O perfil de acesso é atribuído automaticamente conforme os grupos do Active Directory (AD) do usuário. Operador SNOC vê a fila do turno: rondas pendentes, aceite de passagem, terceiros em campo e suas OS. Gestor AGU vê indicadores consolidados e relatórios. Super Admin administra regras de escalonamento e destinatários.",
+    a: "O primeiro acesso é feito com a conta institucional Microsoft 365 e cria um cadastro pendente. Um Gestor ou Super Admin atribui o papel antes da liberação. Operador SNOC vê a fila do turno; Gestor AGU também vê relatórios e aprova usuários; Super Admin mantém a administração completa.",
+  },
+  {
+    q: "Quando a sessão é encerrada?",
+    a: "Além da saída manual, o sistema encerra automaticamente a sessão nas mudanças de turno: 00h, 06h, 12h e 18h. O próximo técnico deve entrar com o próprio perfil.",
   },
 
   {
