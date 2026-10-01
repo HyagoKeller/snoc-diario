@@ -128,7 +128,9 @@ function DetalheRonda() {
                   {i.observacao ? (
                     <p className="mt-2 text-sm text-muted-foreground">{i.observacao}</p>
                   ) : null}
-                  {i.url ? (
+                  {i.url && /\.(mp4|mov|webm|m4v)$/i.test(i.foto_url ?? "") ? (
+                    <video src={i.url} controls className="mt-3 max-h-72 rounded-md border border-border" />
+                  ) : i.url ? (
                     <img
                       src={i.url}
                       alt={`Evidência da não conformidade: ${i.item}`}

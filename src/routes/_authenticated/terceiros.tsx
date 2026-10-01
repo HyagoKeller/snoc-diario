@@ -16,6 +16,7 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { MediaCapture } from "@/components/MediaCapture";
 
 export const Route = createFileRoute("/_authenticated/terceiros")({
   head: () => ({
@@ -37,6 +38,7 @@ function Terceiros() {
   const qc = useQueryClient();
 
   const [pessoa, setPessoa] = useState("");
+  const [modalidade, setModalidade] = useState<"individual" | "grupo">("individual");
   const [documento, setDocumento] = useState("");
   const [tipoDoc, setTipoDoc] = useState("RG");
   const [placa, setPlaca] = useState("");
@@ -103,6 +105,7 @@ function Terceiros() {
         .from("visitas")
         .insert({
           pessoa_nome: pessoa,
+          modalidade,
           documento: documento || null,
           tipo_documento: tipoDoc,
           placa_veiculo: placa.trim() || null,
@@ -122,7 +125,7 @@ function Terceiros() {
       if (atividadeId) {
         await supabase.from("atividades").update({ status: "em_execucao" }).eq("id", atividadeId);
       }
-      await registrarAuditoria("checkin", "visitas", v.id, { pessoa });
+      await registrarAuditoria("checkin", "visitas", v.id, { pessoa, modalidade });
       toast.success("Check-in registrado");
       setPessoa("");
       setDocumento("");
@@ -239,7 +242,10 @@ function Terceiros() {
               <article key={v.id} className="panel p-4">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
-                    <p className="font-semibold">{v.pessoa_nome}</p>
+                    <p className="font-semibold">
+                      {v.pessoa_nome}
+                      {v.modalidade === "grupo" ? " · líder do grupo" : ""}
+                    </p>
                     <p className="text-xs text-muted-foreground">
                       {nomeForn(v.fornecedor_id)} · {v.zona} · {v.tipo_documento || "doc."}{" "}
                       {v.documento || "—"}
@@ -288,7 +294,17 @@ function Terceiros() {
           <section className="panel space-y-4 p-5">
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               <div className="space-y-2">
-                <Label>Nome da pessoa</Label>
+                <Label>Modalidade</Label>
+                <Select value={modalidade} onValueChange={(v) => setModalidade(v as "individual" | "grupo")}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="individual">Individual</SelectItem>
+                    <SelectItem value="grupo">Em grupo</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>{modalidade === "grupo" ? "Nome do líder da excursão" : "Nome da pessoa"}</Label>
                 <Input value={pessoa} onChange={(e) => setPessoa(e.target.value)} />
               </div>
               <div className="space-y-2">
@@ -380,13 +396,8 @@ function Terceiros() {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="fotodoc">Foto do documento / crachá</Label>
-                <Input
-                  id="fotodoc"
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => setFotoDoc(e.target.files?.[0])}
-                />
+                <Label>Foto do documento / crachá {modalidade === "grupo" ? "do líder" : ""}</Label>
+                <MediaCapture id="documento-visita" file={fotoDoc} onFile={setFotoDoc} allowFiles />
               </div>
             </div>
 

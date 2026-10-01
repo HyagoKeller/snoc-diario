@@ -2,7 +2,12 @@ export type Criticidade = "baixa" | "media" | "alta" | "critica";
 export type ItemStatus = "C" | "NC" | "NA";
 export type AppRole = "operador" | "gestor" | "super_admin";
 
-export const TURNOS = ["Manhã (07h-13h)", "Tarde (13h-19h)", "Noite (19h-07h)"] as const;
+export const TURNOS = [
+  "Madrugada (00h-06h)",
+  "Manhã (06h-12h)",
+  "Tarde (12h-18h)",
+  "Noite (18h-00h)",
+] as const;
 
 export const CRITICIDADE_LABEL: Record<Criticidade, string> = {
   baixa: "Baixa",
@@ -112,9 +117,10 @@ export function criticidadeToken(c: Criticidade | null | undefined) {
 
 export function turnoAtual(): string {
   const h = new Date().getHours();
-  if (h >= 7 && h < 13) return TURNOS[0];
-  if (h >= 13 && h < 19) return TURNOS[1];
-  return TURNOS[2];
+  if (h < 6) return TURNOS[0];
+  if (h < 12) return TURNOS[1];
+  if (h < 18) return TURNOS[2];
+  return TURNOS[3];
 }
 
 export function proximoTurno(turno: string): string {
