@@ -132,7 +132,7 @@ function Landing() {
                 {showContingency ? (
                   <form className="space-y-3 border-t border-border pt-4" onSubmit={signInAdmin}>
                     <div className="space-y-1.5">
-                      <Label htmlFor="admin-email">E-mail do Super Admin</Label>
+                      <Label htmlFor="admin-email">E-mail institucional</Label>
                       <Input
                         id="admin-email"
                         type="email"
@@ -154,7 +154,7 @@ function Landing() {
                       />
                     </div>
                     <Button type="submit" variant="outline" className="w-full" disabled={busy}>
-                      Entrar como Super Admin
+                      Entrar
                     </Button>
                   </form>
                 ) : null}
