@@ -355,7 +355,7 @@ function Admin() {
                       {p.ativo ? "Ativo" : "Inativo"}
                     </Badge>
                     <Select
-                      value={papel}
+                      value={papel ?? ""}
                       onValueChange={(v) => definirPapel(p.id, v as AppRole)}
                     >
                       <SelectTrigger className="w-44">
