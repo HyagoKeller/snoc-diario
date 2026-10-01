@@ -65,6 +65,7 @@ function Admin() {
   const [spSite, setSpSite] = useState("");
   const [spBiblioteca, setSpBiblioteca] = useState("");
   const [spPasta, setSpPasta] = useState("SNOC");
+  const [teamsRelatorio, setTeamsRelatorio] = useState("a6a84cea.agu.gov.br@br.teams.ms");
   const [spBusy, setSpBusy] = useState(false);
   const testarSp = useServerFn(testarSharepoint);
 
@@ -117,6 +118,7 @@ function Admin() {
     if (v("sharepoint_site_url")) setSpSite(v("sharepoint_site_url"));
     if (v("sharepoint_biblioteca")) setSpBiblioteca(v("sharepoint_biblioteca"));
     if (v("sharepoint_pasta_raiz")) setSpPasta(v("sharepoint_pasta_raiz"));
+    if (v("teams_relatorio_endereco")) setTeamsRelatorio(v("teams_relatorio_endereco"));
   }, [data?.configs]);
 
   async function salvarChave(chave: string, valor: string) {
@@ -146,6 +148,23 @@ function Admin() {
       toast.error(e instanceof Error ? e.message : "Falha ao salvar");
     } finally {
       setSpBusy(false);
+    }
+  }
+
+  async function salvarTeamsRelatorio() {
+    if (!teamsRelatorio.trim()) {
+      toast.error("Informe o endereço da equipe do Teams.");
+      return;
+    }
+    try {
+      await salvarChave("teams_relatorio_endereco", teamsRelatorio.trim());
+      await registrarAuditoria("atualizar_integracao", "integracoes_config", null, {
+        chave: "teams_relatorio_endereco",
+      });
+      toast.success("Destino do Teams salvo");
+      qc.invalidateQueries({ queryKey: ["admin"] });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Falha ao salvar");
     }
   }
 
@@ -612,6 +631,25 @@ function Admin() {
             <p className="text-xs text-muted-foreground">
               Atualizado {fmtDateTime(data?.integracoes?.updated_at)}.
             </p>
+          </section>
+
+          <section className="panel space-y-4 p-5">
+            <h2 className="text-base font-semibold">Microsoft Teams (relatórios)</h2>
+            <p className="text-sm text-muted-foreground">
+              O relatório mensal será registrado para envio à equipe ou ao canal informado abaixo.
+            </p>
+            <div className="grid gap-4 sm:grid-cols-[1fr_auto] sm:items-end">
+              <div className="space-y-2">
+                <Label>Endereço da equipe / canal</Label>
+                <Input
+                  type="email"
+                  value={teamsRelatorio}
+                  onChange={(e) => setTeamsRelatorio(e.target.value)}
+                  placeholder="equipe@br.teams.ms"
+                />
+              </div>
+              <Button onClick={salvarTeamsRelatorio}>Salvar</Button>
+            </div>
           </section>
 
           <section className="panel space-y-4 p-5">

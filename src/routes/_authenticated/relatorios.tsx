@@ -60,7 +60,7 @@ function Relatorios() {
       d.setMonth(d.getMonth() + 1);
       const fim = d.toISOString();
 
-      const [rondas, itens, passagens, pend, visitas, atividades, evid] = await Promise.all([
+      const [rondas, itens, passagens, pend, visitas, atividades, evid, integracoes] = await Promise.all([
         supabase.from("rondas").select("*").gte("created_at", inicio).lt("created_at", fim),
         supabase.from("ronda_itens").select("*").gte("created_at", inicio).lt("created_at", fim),
         supabase.from("passagens_turno").select("*").gte("created_at", inicio).lt("created_at", fim),
@@ -68,6 +68,7 @@ function Relatorios() {
         supabase.from("visitas").select("*").gte("checkin_em", inicio).lt("checkin_em", fim),
         supabase.from("atividades").select("*").gte("aberta_em", inicio).lt("aberta_em", fim),
         supabase.from("atividade_evidencias").select("*"),
+        supabase.from("integracoes_config").select("chave,valor").eq("chave", "teams_relatorio_endereco").maybeSingle(),
       ]);
 
       const ncs = (itens.data ?? []).filter((i) => i.status === "NC");
@@ -136,16 +137,33 @@ function Relatorios() {
         .eq("evento", "relatorio_mensal")
         .eq("ativa", true);
       const destinatarios = (regras ?? []).map((r) => r.destinatarios).join(", ");
+      const teams = integracoes.data?.valor?.trim() ?? "";
+      const todosDestinatarios = [destinatarios, teams].filter(Boolean).join(", ");
 
       const { error } = await supabase.from("relatorios_mensais").insert({
         tipo: "consolidado",
         periodo_referencia: periodo,
         conteudo: consolidado as never,
-        destinatarios: destinatarios || null,
+        destinatarios: todosDestinatarios || null,
       });
       if (error) throw error;
+      if (teams) {
+        const { error: notificacaoError } = await supabase.from("notificacoes").insert({
+          regra: "relatorio_mensal",
+          destinatario: teams,
+          canal: "teams",
+          assunto: `[SNOC] Relatório mensal ${periodo}`,
+          corpo: `O relatório mensal consolidado de ${periodo} foi gerado e está disponível no SNOC.`,
+          referencia_tipo: "relatorio_mensal",
+        });
+        if (notificacaoError) throw notificacaoError;
+      }
       await registrarAuditoria("gerar_relatorio", "relatorios_mensais", null, { periodo });
-      toast.success(`Relatório de ${periodo} consolidado e arquivado.`);
+      toast.success(
+        teams
+          ? `Relatório de ${periodo} consolidado e encaminhado ao Teams.`
+          : `Relatório de ${periodo} consolidado e arquivado.`,
+      );
       qc.invalidateQueries({ queryKey: ["relatorios"] });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Falha ao gerar relatório");

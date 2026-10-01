@@ -60,7 +60,7 @@ function Atividades() {
   const [chamadosExtra, setChamadosExtra] = useState<string[]>([]);
   const [chamadosExtraCache, setChamadosExtraCache] = useState<ChamadoItsm[]>([]);
   const [osFornecedor, setOsFornecedor] = useState("");
-  const [custo, setCusto] = useState("");
+  const [patrimonioSerial, setPatrimonioSerial] = useState("");
   const [garantia, setGarantia] = useState("");
 
   const { data } = useQuery({
@@ -103,7 +103,7 @@ function Atividades() {
           chamados_itsm: chamadosExtra,
           chamados_itsm_cache: chamadosExtraCache as never,
           numero_os_fornecedor: osFornecedor.trim() || null,
-          custo: custo ? Number(custo) : null,
+          patrimonio_serial: patrimonioSerial.trim() || null,
           garantia_ate: garantia || null,
         })
         .select()
@@ -160,7 +160,7 @@ Aberta por ${profile?.nome ?? "SNOC"}.`,
       setChamado("");
       setChamadoCache(null);
       setOsFornecedor("");
-      setCusto("");
+      setPatrimonioSerial("");
       setGarantia("");
       qc.invalidateQueries({ queryKey: ["atividades"] });
     } catch (e) {
@@ -263,14 +263,11 @@ Aberta por ${profile?.nome ?? "SNOC"}.`,
               />
             </div>
             <div className="space-y-2">
-              <Label>Custo estimado (R$)</Label>
+              <Label>Patrimônio / Serial Number</Label>
               <Input
-                type="number"
-                step="0.01"
-                min={0}
-                value={custo}
-                onChange={(e) => setCusto(e.target.value)}
-                placeholder="0,00"
+                value={patrimonioSerial}
+                onChange={(e) => setPatrimonioSerial(e.target.value)}
+                placeholder="Patrimônio AGU ou serial do fabricante"
               />
             </div>
             <div className="space-y-2">
