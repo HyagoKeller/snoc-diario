@@ -2,7 +2,6 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Camera, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { uploadEvidencia } from "@/lib/storage";
@@ -29,20 +28,23 @@ import {
 import { ChamadoItsmField, ChamadosItsmMulti } from "@/components/ChamadoItsmField";
 import type { ChamadoItsm } from "@/lib/invgate.functions";
 import { fmtDate } from "@/lib/snoc";
+import { MediaCapture } from "@/components/MediaCapture";
 
 export const Route = createFileRoute("/_authenticated/rondas/nova")({
   head: () => ({
     meta: [
       { title: "Nova ronda | SNOC" },
-      { name: "description", content: "Registro de ronda operacional com evidência fotográfica por item." },
+      { name: "description", content: "Registro de ronda operacional com foto ou vídeo por item." },
       { property: "og:title", content: "Nova ronda operacional" },
-      { property: "og:description", content: "Checklist digital do Data Center com foto obrigatória em NC." },
+      { property: "og:description", content: "Checklist digital do Data Center com evidência obrigatória em NC." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: NovaRonda,
 });
 
-type ItemState = { status: ItemStatus; observacao: string; foto?: File | undefined };
+type ItemState = { status: ItemStatus; observacao: string; evidencia?: File | undefined };
 
 const CRITS: Criticidade[] = ["baixa", "media", "alta", "critica"];
 
@@ -98,11 +100,11 @@ function NovaRonda() {
 
   async function salvar() {
     if (!user) return;
-    // Regra do formulário: NC exige observação e foto.
+    // Regra do formulário: NC exige observação e evidência visual.
     for (const [key, st] of Object.entries(itens)) {
       if (st.status !== "NC") continue;
-      if (!st.observacao.trim() || !st.foto) {
-        toast.error(`Item "${key.split("||")[1]}" está NC: observação e foto são obrigatórias.`);
+      if (!st.observacao.trim() || !st.evidencia) {
+        toast.error(`Item "${key.split("||")[1]}" está NC: observação e foto ou vídeo são obrigatórios.`);
         return;
       }
     }
@@ -134,7 +136,7 @@ function NovaRonda() {
       for (const [key, st] of Object.entries(itens)) {
         const [secao, item] = key.split("||");
         let foto_url: string | null = null;
-        if (st.foto) foto_url = await uploadEvidencia(st.foto, `rondas/${ronda.id}`);
+        if (st.evidencia) foto_url = await uploadEvidencia(st.evidencia, `rondas/${ronda.id}`);
         rows.push({
           ronda_id: ronda.id,
           secao: secao!,
@@ -334,27 +336,14 @@ function NovaRonda() {
                         value={st.observacao}
                         onChange={(e) => setItem(key, { observacao: e.target.value })}
                       />
-                      <div className="flex flex-wrap items-center gap-3">
-                        <Label
-                          className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-border px-3 py-2 text-sm hover:bg-accent"
-                          htmlFor={`foto-${key}`}
-                        >
-                          <Camera className="size-4" />
-                          {st.foto ? "Trocar foto" : "Anexar foto (obrigatória)"}
-                        </Label>
-                        <input
-                          id={`foto-${key}`}
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={(e) => setItem(key, { foto: e.target.files?.[0] })}
-                        />
-                        {st.foto ? (
-                          <span className="flex items-center gap-1 text-xs text-ok">
-                            <Check className="size-3" /> {st.foto.name}
-                          </span>
-                        ) : null}
-                      </div>
+                      <MediaCapture
+                        id={`ronda-${key.replaceAll("||", "-").replaceAll(" ", "-")}`}
+                        file={st.evidencia}
+                        onFile={(evidencia) => setItem(key, { evidencia })}
+                        allowVideo
+                        allowFiles
+                        required
+                      />
                     </div>
                   ) : null}
                 </div>

@@ -12,10 +12,12 @@ export const Route = createFileRoute("/_authenticated/rondas/")({
       { title: "Rondas operacionais | SNOC" },
       {
         name: "description",
-        content: "Histórico de rondas do Data Center com não conformidades, criticidade e evidência fotográfica.",
+        content: "Histórico de rondas do Data Center com não conformidades, criticidade, fotos e vídeos.",
       },
       { property: "og:title", content: "Rondas operacionais do SNOC" },
-      { property: "og:description", content: "Checklist digital por seção com evidência fotográfica." },
+      { property: "og:description", content: "Checklist digital por seção com evidência visual." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: Rondas,
@@ -41,7 +43,7 @@ function Rondas() {
           <p className="label-mono">Módulo 3.1</p>
           <h1 className="mt-1 text-2xl font-bold">Rondas operacionais</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Checklist por seção, foto obrigatória em não conformidade e resumo calculado pelo sistema.
+            Checklist por seção, foto ou vídeo obrigatório em não conformidade e resumo calculado pelo sistema.
           </p>
         </div>
         <Button asChild>

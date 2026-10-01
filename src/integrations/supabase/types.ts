@@ -122,6 +122,7 @@ export type Database = {
           janela_inicio: string | null
           nota_fiscal_url: string | null
           numero_os_fornecedor: string | null
+          patrimonio_serial: string | null
           status: Database["public"]["Enums"]["atividade_status"]
           tipo: Database["public"]["Enums"]["atividade_tipo"]
           titulo: string
@@ -148,6 +149,7 @@ export type Database = {
           janela_inicio?: string | null
           nota_fiscal_url?: string | null
           numero_os_fornecedor?: string | null
+          patrimonio_serial?: string | null
           status?: Database["public"]["Enums"]["atividade_status"]
           tipo: Database["public"]["Enums"]["atividade_tipo"]
           titulo: string
@@ -174,6 +176,7 @@ export type Database = {
           janela_inicio?: string | null
           nota_fiscal_url?: string | null
           numero_os_fornecedor?: string | null
+          patrimonio_serial?: string | null
           status?: Database["public"]["Enums"]["atividade_status"]
           tipo?: Database["public"]["Enums"]["atividade_tipo"]
           titulo?: string
@@ -762,6 +765,7 @@ export type Database = {
           fornecedor_id: string | null
           foto_documento_url: string | null
           id: string
+          modalidade: string
           motivo_visita: string | null
           pessoa_nome: string
           placa_veiculo: string | null
@@ -782,6 +786,7 @@ export type Database = {
           fornecedor_id?: string | null
           foto_documento_url?: string | null
           id?: string
+          modalidade?: string
           motivo_visita?: string | null
           pessoa_nome: string
           placa_veiculo?: string | null
@@ -802,6 +807,7 @@ export type Database = {
           fornecedor_id?: string | null
           foto_documento_url?: string | null
           id?: string
+          modalidade?: string
           motivo_visita?: string | null
           pessoa_nome?: string
           placa_veiculo?: string | null

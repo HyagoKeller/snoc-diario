@@ -20,6 +20,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ChamadoItsmCard, ChamadosItsmLista } from "@/components/ChamadoItsmField";
 import { fmtDate } from "@/lib/snoc";
+import { MediaCapture } from "@/components/MediaCapture";
 
 export const Route = createFileRoute("/_authenticated/atividades/$id")({
   head: () => ({
@@ -27,7 +28,9 @@ export const Route = createFileRoute("/_authenticated/atividades/$id")({
       { title: "Ordem de serviço | SNOC" },
       { name: "description", content: "Evidências antes/depois, laudo do fornecedor e fechamento da OS." },
       { property: "og:title", content: "Ordem de serviço do SNOC" },
-      { property: "og:description", content: "Registro auditável de execução com evidência fotográfica." },
+      { property: "og:description", content: "Registro auditável de execução com foto ou vídeo." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: DetalheOS,
@@ -130,7 +133,7 @@ function DetalheOS() {
     const temAntes = evidencias.some((e) => e.tipo === "antes");
     const temDepois = evidencias.some((e) => e.tipo === "depois");
     if (!temAntes || !temDepois) {
-      toast.error("A OS só pode ser fechada com evidência fotográfica antes e depois.");
+      toast.error("A OS só pode ser fechada com evidência visual antes e depois.");
       return;
     }
     const semCheckout = (data?.visitas ?? []).some((v) => !v.checkout_em);
@@ -199,12 +202,8 @@ function DetalheOS() {
             <dd className="mt-1 text-muted-foreground">{a.numero_os_fornecedor || "—"}</dd>
           </div>
           <div>
-            <dt className="label-mono">Custo</dt>
-            <dd className="mt-1 text-muted-foreground">
-              {a.custo != null
-                ? Number(a.custo).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
-                : "—"}
-            </dd>
+            <dt className="label-mono">Patrimônio / Serial Number</dt>
+            <dd className="mt-1 text-muted-foreground">{a.patrimonio_serial || "—"}</dd>
           </div>
           <div>
             <dt className="label-mono">Garantia até</dt>
@@ -240,13 +239,8 @@ function DetalheOS() {
         <h2 className="text-base font-semibold">Nota fiscal / documento financeiro</h2>
         <div className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
           <div className="space-y-2">
-            <Label htmlFor="nf">Arquivo (imagem ou PDF)</Label>
-            <Input
-              id="nf"
-              type="file"
-              accept="image/*,application/pdf"
-              onChange={(e) => setNota(e.target.files?.[0])}
-            />
+            <Label>Arquivo (imagem ou PDF)</Label>
+            <MediaCapture id="nota-fiscal" file={nota} onFile={setNota} allowFiles />
           </div>
           <Button variant="outline" onClick={enviarNota} disabled={busy}>
             <Upload className="size-4" /> Anexar nota
@@ -271,13 +265,8 @@ function DetalheOS() {
             </Select>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="arq">Arquivo (imagem ou PDF)</Label>
-            <Input
-              id="arq"
-              type="file"
-              accept="image/*,application/pdf"
-              onChange={(e) => setArquivo(e.target.files?.[0])}
-            />
+            <Label>Foto, vídeo ou documento</Label>
+            <MediaCapture id="evidencia-os" file={arquivo} onFile={setArquivo} allowVideo allowFiles />
           </div>
           <Button onClick={enviar} disabled={busy}>
             <Upload className="size-4" /> Anexar
@@ -302,6 +291,13 @@ function DetalheOS() {
                       >
                         Abrir documento ({fmtDateTime(e.enviado_em)})
                       </a>
+                    ) : /\.(mp4|mov|webm|m4v)$/i.test(e.arquivo_url) ? (
+                      <video
+                        key={e.id}
+                        src={e.url ?? ""}
+                        controls
+                        className="rounded-md border border-border"
+                      />
                     ) : (
                       <img
                         key={e.id}

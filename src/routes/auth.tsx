@@ -17,6 +17,8 @@ export const Route = createFileRoute("/auth")({
       { name: "description", content: "Acesso dos operadores e gestores do SNOC ao sistema." },
       { property: "og:title", content: "Entrar no SNOC" },
       { property: "og:description", content: "Autenticação da equipe do Network Operations Center." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: AuthPage,

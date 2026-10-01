@@ -111,7 +111,7 @@ const SECOES: Secao[] = [
       {
         titulo: "Registrar não conformidade",
         texto:
-          "Ao marcar NC, informe a criticidade (baixa, média, alta ou crítica), descreva o problema e anexe a foto — a evidência é obrigatória.",
+          "Ao marcar NC, informe a criticidade (baixa, média, alta ou crítica), descreva o problema e fotografe ou grave um vídeo — a evidência é obrigatória.",
       },
       {
         titulo: "Finalizar",
@@ -120,7 +120,8 @@ const SECOES: Secao[] = [
       },
     ],
     regras: [
-      "Sem foto, o item NC não permite finalizar a ronda.",
+      "Sem foto ou vídeo, o item NC não permite finalizar a ronda.",
+      "Os turnos são Madrugada (00h–06h), Manhã (06h–12h), Tarde (12h–18h) e Noite (18h–00h).",
       "Criticidade alta ou crítica deve gerar uma OS no módulo Atividades.",
       "Somente o responsável pela ronda ou um gestor pode alterá-la.",
     ],
@@ -173,7 +174,7 @@ const SECOES: Secao[] = [
       {
         titulo: "Check-in",
         texto:
-          "Informe a pessoa, o documento (com foto), a zona de acesso, a OS vinculada, o acompanhante interno e a duração prevista. Registre o consentimento LGPD.",
+          "Escolha visita individual ou em grupo. No grupo, informe apenas o líder da excursão, seu documento com foto, a zona, a OS, o acompanhante interno e a duração prevista. Registre o consentimento LGPD.",
       },
       {
         titulo: "Acompanhamento",
@@ -202,7 +203,7 @@ const SECOES: Secao[] = [
       {
         titulo: "Abrir OS",
         texto:
-          "Atividades → nova. Escolha o tipo (preventiva, corretiva, troca de peça, instalação), descreva o problema, informe o ativo afetado, a criticidade, o fornecedor e a janela prevista.",
+          "Atividades → nova. Escolha o tipo, descreva o problema e informe o ativo, patrimônio ou serial, criticidade, fornecedor e janela prevista.",
       },
       {
         titulo: "Acionar fornecedor",
@@ -217,7 +218,7 @@ const SECOES: Secao[] = [
       {
         titulo: "Anexar evidências",
         texto:
-          "Envie a foto “antes”, a foto “depois” e, quando houver, o laudo técnico do fornecedor.",
+          "Capture foto ou vídeo de “antes” e “depois” e, quando houver, anexe o laudo técnico do fornecedor.",
       },
       {
         titulo: "Fechar",

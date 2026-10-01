@@ -9,13 +9,15 @@ export const Route = createFileRoute("/faq")({
       {
         name: "description",
         content:
-          "O que o SNOC registra: rondas com evidência fotográfica, passagem de turno com prazo de aceite, acesso de terceiros e ordens de serviço, papéis de acesso e tratamento de dados.",
+          "O que o SNOC registra: rondas com foto ou vídeo, passagem de turno, acesso de terceiros e ordens de serviço.",
       },
       { property: "og:title", content: "Perguntas frequentes do SNOC" },
       {
         property: "og:description",
         content: "Módulos, papéis de acesso, prazos de escalonamento e tratamento de dados pessoais.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: Faq,
@@ -26,7 +28,7 @@ const MODULOS = [
     icon: ClipboardCheck,
     titulo: "Rondas operacionais",
     texto:
-      "Checklist digital por seção com C/NC/NA. Toda não conformidade exige foto e criticidade, e o resumo do turno é calculado pelo sistema.",
+      "Checklist digital por seção com C/NC/NA. Toda não conformidade exige foto ou vídeo e criticidade, e o resumo do turno é calculado pelo sistema.",
   },
   {
     icon: Repeat2,
@@ -38,13 +40,13 @@ const MODULOS = [
     icon: ShieldCheck,
     titulo: "Acesso de terceiros",
     texto:
-      "Check-in amarrado a uma OS, foto de documento, acompanhante interno, consentimento LGPD e check-out obrigatório, com alerta quando passa da duração prevista.",
+      "Check-in individual ou em grupo, amarrado a uma OS. No grupo, somente os dados do líder da excursão são preenchidos.",
   },
   {
     icon: Wrench,
     titulo: "Atividades e OS",
     texto:
-      "Abertura da ordem, aviso ao fornecedor, evidência antes/depois, laudo anexado e fechamento rastreável.",
+      "Abertura da ordem com patrimônio ou serial, aviso ao fornecedor, evidência antes/depois e fechamento rastreável.",
   },
   {
     icon: FileText,
@@ -67,8 +69,8 @@ const PERGUNTAS = [
   },
 
   {
-    q: "Por que a foto é obrigatória em não conformidade?",
-    a: "A evidência fotográfica substitui o formulário em papel e sustenta o registro em auditoria. Sem a foto, o item não conforme não pode ser finalizado na ronda.",
+    q: "Por que a evidência é obrigatória em não conformidade?",
+    a: "A foto ou o vídeo sustenta o registro em auditoria. No celular, os botões abrem a câmera diretamente. Sem evidência, o item não conforme não pode ser finalizado.",
   },
   {
     q: "O que acontece se ninguém aceitar a passagem de turno?",

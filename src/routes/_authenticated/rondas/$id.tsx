@@ -12,9 +12,11 @@ export const Route = createFileRoute("/_authenticated/rondas/$id")({
   head: () => ({
     meta: [
       { title: "Detalhe da ronda | SNOC" },
-      { name: "description", content: "Itens, não conformidades e evidências fotográficas da ronda." },
+      { name: "description", content: "Itens, não conformidades e evidências em foto ou vídeo da ronda." },
       { property: "og:title", content: "Detalhe da ronda operacional" },
       { property: "og:description", content: "Registro auditável de uma ronda do Data Center." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: DetalheRonda,
@@ -128,7 +130,9 @@ function DetalheRonda() {
                   {i.observacao ? (
                     <p className="mt-2 text-sm text-muted-foreground">{i.observacao}</p>
                   ) : null}
-                  {i.url ? (
+                  {i.url && /\.(mp4|mov|webm|m4v)$/i.test(i.foto_url ?? "") ? (
+                    <video src={i.url} controls className="mt-3 max-h-72 rounded-md border border-border" />
+                  ) : i.url ? (
                     <img
                       src={i.url}
                       alt={`Evidência da não conformidade: ${i.item}`}

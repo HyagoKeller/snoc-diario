@@ -28,6 +28,8 @@ export const Route = createFileRoute("/_authenticated/painel")({
       },
       { property: "og:title", content: "Painel operacional do SNOC" },
       { property: "og:description", content: "Visão do turno e indicadores consolidados do Data Center." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: Painel,
