@@ -51,29 +51,29 @@ const SECOES: Secao[] = [
     titulo: "1. Acesso e papéis",
     icon: LogIn,
     resumo:
-      "O SNOC é de uso restrito à operação do Data Center da AGU. O acesso é feito com e-mail institucional e senha, e todo login e ação relevante fica registrado em auditoria.",
+      "O SNOC é de uso restrito à operação da AGU. O acesso é feito com a conta institucional Microsoft 365, e todo login e ação relevante fica registrado em auditoria.",
     passos: [
       {
-        titulo: "Criar conta",
+        titulo: "Primeiro acesso",
         texto:
-          "Na tela de acesso, use a aba de cadastro, informe nome completo, e-mail institucional e senha. Todo novo usuário entra com o papel Operador.",
+          "Na página inicial, use Entrar com Microsoft 365. O primeiro acesso cria o cadastro como pendente; um Gestor ou Super Admin deve atribuir o papel antes da liberação.",
       },
       {
         titulo: "Entrar",
         texto:
-          "Informe e-mail e senha. Após autenticar, o sistema abre o Painel operacional com a fila do seu turno.",
+          "Use a conta institucional. Depois que o papel for aprovado, o sistema abre o Painel operacional com a fila do seu turno.",
       },
       {
         titulo: "Sair",
         texto:
-          "Use o botão Sair na barra lateral (ou no topo, no celular). A sessão é encerrada e os dados em cache são limpos.",
+          "Use o botão Sair na barra lateral (ou no topo, no celular). A sessão também é encerrada automaticamente a cada mudança de turno.",
       },
     ],
     regras: [
       "Operador SNOC: registra rondas, passagens de turno, acessos de terceiros e ordens de serviço; vê a própria fila.",
       "Gestor AGU: enxerga tudo do operador mais indicadores consolidados e o módulo de Relatórios.",
       "Super Admin: além do acima, administra papéis, regras de escalonamento, notificações e auditoria.",
-      "A mudança de papel é feita apenas pelo Super Admin, em Administração → Usuários.",
+      "Gestores e Super Admins atribuem papéis em Administração → Usuários; somente o Super Admin pode conceder esse mesmo nível.",
     ],
   },
   {

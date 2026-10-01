@@ -50,7 +50,7 @@ const EVENTOS = [
 ];
 
 function Admin() {
-  const { isAdmin } = useAuth();
+  const { isManager, isAdmin } = useAuth();
   const qc = useQueryClient();
   const [evento, setEvento] = useState(EVENTOS[0]!.valor);
   const [prazo, setPrazo] = useState("15");
@@ -257,6 +257,10 @@ function Admin() {
   }
 
   async function definirPapel(userId: string, role: AppRole) {
+    if (role === "super_admin" && !isAdmin) {
+      toast.error("Somente o Super Admin pode atribuir esse papel.");
+      return;
+    }
     const atuais = papeis.filter((p) => p.user_id === userId);
     for (const a of atuais) await supabase.from("user_roles").delete().eq("id", a.id);
     const { error } = await supabase.from("user_roles").insert({ user_id: userId, role });
@@ -264,6 +268,7 @@ function Admin() {
       toast.error(error.message);
       return;
     }
+    await supabase.from("profiles").update({ ativo: true }).eq("id", userId);
     await registrarAuditoria("definir_papel", "user_roles", userId, { role });
     toast.success(`Papel atualizado para ${ROLE_LABEL[role]}`);
     qc.invalidateQueries({ queryKey: ["admin"] });
@@ -309,8 +314,8 @@ function Admin() {
     qc.invalidateQueries({ queryKey: ["admin"] });
   }
 
-  if (!isAdmin) {
-    return <p className="panel p-6 text-sm text-muted-foreground">Área restrita ao Super Admin.</p>;
+  if (!isManager) {
+    return <p className="panel p-6 text-sm text-muted-foreground">Área restrita a gestores.</p>;
   }
 
   return (
@@ -350,14 +355,14 @@ function Admin() {
                       {p.ativo ? "Ativo" : "Inativo"}
                     </Badge>
                     <Select
-                      value={papel ?? "operador"}
+                      value={papel}
                       onValueChange={(v) => definirPapel(p.id, v as AppRole)}
                     >
                       <SelectTrigger className="w-44">
-                        <SelectValue />
+                        <SelectValue placeholder="Atribuir papel" />
                       </SelectTrigger>
                       <SelectContent>
-                        {(["operador", "gestor", "super_admin"] as AppRole[]).map((r) => (
+                        {(["operador", "gestor", ...(isAdmin ? ["super_admin" as const] : [])] as AppRole[]).map((r) => (
                           <SelectItem key={r} value={r}>
                             {ROLE_LABEL[r]}
                           </SelectItem>
@@ -373,9 +378,9 @@ function Admin() {
             })}
           </div>
           <p className="mt-3 text-xs text-muted-foreground">
-            O campo “grupo AD” prepara o mapeamento automático de papéis quando o login federado
-            (Entra ID) for habilitado: cada grupo do AD passa a definir o papel, sem manutenção
-            manual.
+             No primeiro acesso com a conta Microsoft 365, o usuário fica pendente. Um Gestor ou
+             Super Admin atribui o papel e libera o acesso; somente o Super Admin pode conceder esse
+             mesmo nível de administração.
           </p>
         </TabsContent>
 
