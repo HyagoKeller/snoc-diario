@@ -15,6 +15,8 @@ export const Route = createFileRoute("/_authenticated/rondas/$id")({
       { name: "description", content: "Itens, não conformidades e evidências em foto ou vídeo da ronda." },
       { property: "og:title", content: "Detalhe da ronda operacional" },
       { property: "og:description", content: "Registro auditável de uma ronda do Data Center." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: DetalheRonda,

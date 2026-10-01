@@ -28,6 +28,8 @@ export const Route = createFileRoute("/_authenticated/terceiros")({
       },
       { property: "og:title", content: "Acesso de terceiros no Data Center" },
       { property: "og:description", content: "Log de acesso auditável com alerta de check-out em atraso." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: Terceiros,

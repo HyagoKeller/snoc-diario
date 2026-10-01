@@ -37,6 +37,8 @@ export const Route = createFileRoute("/_authenticated/rondas/nova")({
       { name: "description", content: "Registro de ronda operacional com foto ou vídeo por item." },
       { property: "og:title", content: "Nova ronda operacional" },
       { property: "og:description", content: "Checklist digital do Data Center com evidência obrigatória em NC." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: NovaRonda,

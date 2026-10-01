@@ -27,6 +27,8 @@ export const Route = createFileRoute("/_authenticated/admin")({
       },
       { property: "og:title", content: "Administração do SNOC" },
       { property: "og:description", content: "Configuração de papéis, notificações e auditoria." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: Admin,

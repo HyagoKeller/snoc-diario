@@ -18,6 +18,8 @@ export const Route = createFileRoute("/")({
         property: "og:description",
         content: "Diário de bordo operacional do SNOC. Acesso restrito e monitorado.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: Landing,

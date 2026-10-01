@@ -16,6 +16,8 @@ export const Route = createFileRoute("/_authenticated/rondas/")({
       },
       { property: "og:title", content: "Rondas operacionais do SNOC" },
       { property: "og:description", content: "Checklist digital por seção com evidência visual." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: Rondas,

@@ -35,6 +35,8 @@ export const Route = createFileRoute("/_authenticated/atividades/")({
       },
       { property: "og:title", content: "Atividades e OS do SNOC" },
       { property: "og:description", content: "Ciclo completo de troca de peça com evidência fotográfica." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: Atividades,

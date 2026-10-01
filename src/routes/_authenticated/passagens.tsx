@@ -33,6 +33,8 @@ export const Route = createFileRoute("/_authenticated/passagens")({
       },
       { property: "og:title", content: "Passagem de turno do SNOC" },
       { property: "og:description", content: "Aceite com prazo, pendências e escalonamento em níveis." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: Passagens,

@@ -16,6 +16,8 @@ export const Route = createFileRoute("/faq")({
         property: "og:description",
         content: "Módulos, papéis de acesso, prazos de escalonamento e tratamento de dados pessoais.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: Faq,

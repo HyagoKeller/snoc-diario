@@ -29,6 +29,8 @@ export const Route = createFileRoute("/_authenticated/atividades/$id")({
       { name: "description", content: "Evidências antes/depois, laudo do fornecedor e fechamento da OS." },
       { property: "og:title", content: "Ordem de serviço do SNOC" },
       { property: "og:description", content: "Registro auditável de execução com foto ou vídeo." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: DetalheOS,

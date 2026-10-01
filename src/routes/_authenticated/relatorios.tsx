@@ -23,6 +23,8 @@ export const Route = createFileRoute("/_authenticated/relatorios")({
       },
       { property: "og:title", content: "Relatórios mensais do SNOC" },
       { property: "og:description", content: "Histórico consolidado mês a mês, pesquisável e arquivado." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: Relatorios,
