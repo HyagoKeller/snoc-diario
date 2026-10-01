@@ -331,11 +331,11 @@ function Admin() {
       <Tabs defaultValue="usuarios">
         <TabsList>
           <TabsTrigger value="usuarios">Usuários e papéis</TabsTrigger>
-          <TabsTrigger value="turnos">Turnos e equipes</TabsTrigger>
-          <TabsTrigger value="regras">Notificações</TabsTrigger>
-          <TabsTrigger value="disparos">Disparos</TabsTrigger>
-          <TabsTrigger value="auditoria">Auditoria</TabsTrigger>
-          <TabsTrigger value="integracoes">Integrações</TabsTrigger>
+          {isAdmin ? <TabsTrigger value="turnos">Turnos e equipes</TabsTrigger> : null}
+          {isAdmin ? <TabsTrigger value="regras">Notificações</TabsTrigger> : null}
+          {isAdmin ? <TabsTrigger value="disparos">Disparos</TabsTrigger> : null}
+          {isAdmin ? <TabsTrigger value="auditoria">Auditoria</TabsTrigger> : null}
+          {isAdmin ? <TabsTrigger value="integracoes">Integrações</TabsTrigger> : null}
         </TabsList>
 
         <TabsContent value="usuarios" className="pt-4">
@@ -384,7 +384,7 @@ function Admin() {
           </p>
         </TabsContent>
 
-        <TabsContent value="turnos" className="space-y-4 pt-4">
+        <TabsContent value="turnos" className={isAdmin ? "space-y-4 pt-4" : "hidden"}>
           <p className="text-sm text-muted-foreground">
             Cada turno recebe um grupo do Active Directory (origem dos técnicos) e os e-mails dos
             coordenadores que devem ser avisados. A passagem de turno é enviada ao primeiro técnico
@@ -469,7 +469,7 @@ function Admin() {
           })}
         </TabsContent>
 
-        <TabsContent value="regras" className="space-y-4 pt-4">
+        <TabsContent value="regras" className={isAdmin ? "space-y-4 pt-4" : "hidden"}>
           <section className="panel space-y-4 p-5">
             <h2 className="text-base font-semibold">Nova regra</h2>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -582,7 +582,7 @@ function Admin() {
           </div>
         </TabsContent>
 
-        <TabsContent value="disparos" className="pt-4">
+        <TabsContent value="disparos" className={isAdmin ? "pt-4" : "hidden"}>
           <div className="panel divide-y divide-border">
             {(data?.notifs ?? []).map((n) => (
               <div key={n.id} className="p-4">
@@ -598,7 +598,7 @@ function Admin() {
           </div>
         </TabsContent>
 
-        <TabsContent value="auditoria" className="pt-4">
+        <TabsContent value="auditoria" className={isAdmin ? "pt-4" : "hidden"}>
           <div className="panel divide-y divide-border">
             {(data?.auditoria ?? []).map((a) => (
               <div key={a.id} className="p-4 text-sm">
@@ -617,7 +617,7 @@ function Admin() {
           </div>
         </TabsContent>
 
-        <TabsContent value="integracoes" className="space-y-4 pt-4">
+        <TabsContent value="integracoes" className={isAdmin ? "space-y-4 pt-4" : "hidden"}>
           <section className="panel space-y-4 p-5">
             <h2 className="text-base font-semibold">InvGate (Service Desk / ITSM)</h2>
             <p className="text-sm text-muted-foreground">

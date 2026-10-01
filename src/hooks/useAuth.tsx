@@ -35,6 +35,11 @@ const AuthContext = createContext<AuthValue>({
 
 const PRIORITY: AppRole[] = ["super_admin", "gestor", "operador"];
 
+function shiftSessionKey() {
+  const now = new Date();
+  return `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}-${turnoAtual()}`;
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -89,7 +94,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!session) return;
 
     const enforceShift = async () => {
-      const nowShift = turnoAtual();
+      const nowShift = shiftSessionKey();
       const signedInShift = window.localStorage.getItem("snoc-auth-shift");
       if (signedInShift && signedInShift !== nowShift) {
         toast.info("Fim do turno atingido. Por segurança, sua sessão foi encerrada.");
