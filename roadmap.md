@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Preparar autenticação básica do InvGate com usuário e chave privados, diagnóstico e consulta de teste.
+- [x] Preparar autenticação básica do InvGate com usuário e chave privados, diagnóstico e consulta de teste; validação real depende das credenciais.
 
 - [x] Consultar ficha completa com assinatura ao final.
 - [x] Zonas Sede 1/Sede 3 e personalização das opções e botões de visitas.
