@@ -105,12 +105,12 @@ export const buscarChamadoItsm = createServerFn({ method: "POST" })
       chamado: {
         numero,
         titulo: primeiro(campos, ["title", "subject", "summary", "name"]),
-        status: primeiro(campos, ["status", "state", "incident.status"]),
-        prioridade: primeiro(campos, ["priority", "urgency", "impact"]),
-        categoria: primeiro(campos, ["category", "categoryName", "service"]),
-        solicitante: primeiro(campos, ["requester", "created_by", "customer", "author"]),
+        status: primeiro(campos, ["status", "state", "incident.status"]) ?? (campos["status_id"] != null ? `Status ID ${campos["status_id"]}` : null),
+        prioridade: primeiro(campos, ["priority", "urgency", "impact"]) ?? (campos["priority_id"] != null ? `Prioridade ID ${campos["priority_id"]}` : null),
+        categoria: primeiro(campos, ["category", "categoryName", "service"]) ?? (campos["category_id"] != null ? `Categoria ID ${campos["category_id"]}` : null),
+        solicitante: primeiro(campos, ["requester", "created_by", "customer", "author"]) ?? (campos["user_id"] != null ? `Usuário ID ${campos["user_id"]}` : null),
         criado_em: primeiro(campos, ["created_at", "creation_date", "createdDate", "date"]),
-        url: `${base}/incident/${encodeURIComponent(numero)}`,
+        url: `${base}/view/${encodeURIComponent(primeiro(campos, ["id"]) ?? numero)}`,
         consultado_em: new Date().toISOString(),
       },
     };
