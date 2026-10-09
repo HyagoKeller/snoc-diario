@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1791567328103,
+      "tag": "0000_visitas_ficha_assinatura_tablet",
+      "breakpoints": true
+    }
+  ]
+}

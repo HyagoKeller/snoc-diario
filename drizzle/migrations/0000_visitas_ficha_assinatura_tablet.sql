@@ -1,0 +1,3 @@
+ALTER TABLE public.visitas ADD COLUMN IF NOT EXISTS ficha_registro jsonb NOT NULL DEFAULT '{}'::jsonb, ADD COLUMN IF NOT EXISTS chamados_itsm text[] NOT NULL DEFAULT '{}'::text[], ADD COLUMN IF NOT EXISTS chamados_itsm_cache jsonb NOT NULL DEFAULT '[]'::jsonb, ADD COLUMN IF NOT EXISTS assinatura_saida_path text, ADD COLUMN IF NOT EXISTS checkout_registrado_por uuid;
+COMMENT ON COLUMN public.visitas.placa_veiculo IS 'DEPRECATED: informações veiculares removidas do formulário de visitas; mantida para histórico.';
+COMMENT ON COLUMN public.visitas.assinatura_saida_path IS 'Caminho privado da assinatura manuscrita de saída capturada no tablet.';

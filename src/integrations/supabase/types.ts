@@ -755,13 +755,18 @@ export type Database = {
       visitas: {
         Row: {
           acompanhante_id: string | null
+          assinatura_saida_path: string | null
           atividade_id: string | null
+          chamados_itsm: string[]
+          chamados_itsm_cache: Json
           checkin_em: string
           checkout_em: string | null
+          checkout_registrado_por: string | null
           consentimento_lgpd: boolean
           created_at: string
           documento: string | null
           duracao_prevista_min: number
+          ficha_registro: Json
           fornecedor_id: string | null
           foto_documento_url: string | null
           id: string
@@ -776,13 +781,18 @@ export type Database = {
         }
         Insert: {
           acompanhante_id?: string | null
+          assinatura_saida_path?: string | null
           atividade_id?: string | null
+          chamados_itsm?: string[]
+          chamados_itsm_cache?: Json
           checkin_em?: string
           checkout_em?: string | null
+          checkout_registrado_por?: string | null
           consentimento_lgpd?: boolean
           created_at?: string
           documento?: string | null
           duracao_prevista_min?: number
+          ficha_registro?: Json
           fornecedor_id?: string | null
           foto_documento_url?: string | null
           id?: string
@@ -797,13 +807,18 @@ export type Database = {
         }
         Update: {
           acompanhante_id?: string | null
+          assinatura_saida_path?: string | null
           atividade_id?: string | null
+          chamados_itsm?: string[]
+          chamados_itsm_cache?: Json
           checkin_em?: string
           checkout_em?: string | null
+          checkout_registrado_por?: string | null
           consentimento_lgpd?: boolean
           created_at?: string
           documento?: string | null
           duracao_prevista_min?: number
+          ficha_registro?: Json
           fornecedor_id?: string | null
           foto_documento_url?: string | null
           id?: string
