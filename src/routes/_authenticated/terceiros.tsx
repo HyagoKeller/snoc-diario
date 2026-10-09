@@ -141,15 +141,15 @@ function Terceiros() {
           pessoa_nome: pessoa,
           modalidade,
           documento: documento || null,
-          tipo_documento: tipoDoc,
-           ficha_registro: JSON.parse(JSON.stringify({ ...ficha, campos: { ...ficha.campos, tipo: ficha.campos.tipo || settings.tipos[0], criticidade: ficha.campos.criticidade || "Normal" } })) as Json,
+          tipo_documento: settings.documentos.includes(tipoDoc) ? tipoDoc : settings.documentos[0] ?? "RG",
+          ficha_registro: JSON.parse(JSON.stringify({ ...ficha, campos: { ...ficha.campos, tipo: ficha.campos['tipo'] || settings.tipos[0], criticidade: ficha.campos['criticidade'] || "Normal" } })) as Json,
           chamados_itsm: chamados,
           chamados_itsm_cache: JSON.parse(JSON.stringify(caches)) as Json,
           motivo_visita: motivo.trim() || null,
           foto_documento_url: foto,
           fornecedor_id: fornecedorId || null,
           atividade_id: atividadeId || null,
-          zona: settings.zonas.includes(zona) ? zona : settings.zonas[0],
+          zona: settings.zonas.includes(zona) ? zona : settings.zonas[0] ?? "Data Center Sede 1",
           duracao_prevista_min: Number(duracao || 120),
           acompanhante_id: acompanhante || null,
           consentimento_lgpd: consent,
@@ -357,7 +357,7 @@ function Terceiros() {
               </div>
               <div className="space-y-2">
                 <Label>Tipo de documento</Label>
-                <Select value={tipoDoc} onValueChange={setTipoDoc}>
+                <Select value={settings.documentos.includes(tipoDoc) ? tipoDoc : settings.documentos[0] ?? ""} onValueChange={setTipoDoc}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
