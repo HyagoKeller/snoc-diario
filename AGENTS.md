@@ -15,3 +15,5 @@
 - Bind browser sessions to one six-hour operational shift and sign out when the shift changes.
 - Store extended visitor form data in the visit's JSON record and signatures as private evidence paths; this keeps the original access history compatible while linking signed checkout to its visit.
 - Use a reusable signature-pad capture with touch-safe canvas sizing for handwritten operational signatures; this preserves strokes on tablet orientation changes.
+- Store visit presentation settings as a validated JSON entry in integracoes_config and share its query across administration and check-in; this keeps options consistent without changing historical records.
+- Render visit consultation through a read-only record component and resolve evidence paths with short-lived signed URLs; this keeps completed forms intact and evidence private.

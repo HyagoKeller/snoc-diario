@@ -16,6 +16,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { VisitSettingsPanel } from "@/components/VisitSettingsPanel";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
@@ -52,7 +53,8 @@ const EVENTOS = [
 function Admin() {
   const { isManager, isAdmin } = useAuth();
   const qc = useQueryClient();
-  const [evento, setEvento] = useState(EVENTOS[0]!.valor);
+  const [evento, setEvento] = useState(EVENTOS[0]?.valor ?? "ronda_nc");
+  const [canal, setCanal] = useState("email");
   const [prazo, setPrazo] = useState("15");
   const [nivel, setNivel] = useState("1");
   const [destinatarios, setDestinatarios] = useState("");
@@ -275,8 +277,8 @@ function Admin() {
   }
 
   async function criarRegra() {
-    if (!destinatarios.trim()) {
-      toast.error("Informe ao menos um e-mail de destinatário.");
+    if (!destinatarios.trim() && !notifCoord && !notifGest) {
+      toast.error("Informe um destinatário ou selecione coordenadores / gestores.");
       return;
     }
     const { error } = await supabase.from("regras_escalonamento").insert({
@@ -284,6 +286,7 @@ function Admin() {
       prazo_minutos: Number(prazo || 15),
       nivel: Number(nivel || 1),
       destinatarios,
+      canal,
       criticidade_minima: critMin === "nenhuma" ? null : (critMin as "baixa" | "media" | "alta" | "critica"),
       notificar_coordenadores: notifCoord,
       notificar_gestores: notifGest,
@@ -329,13 +332,15 @@ function Admin() {
       </header>
 
       <Tabs defaultValue="usuarios">
-        <TabsList>
+        <TabsList className="h-auto flex-wrap justify-start gap-1">
           <TabsTrigger value="usuarios">Usuários e papéis</TabsTrigger>
           {isAdmin ? <TabsTrigger value="turnos">Turnos e equipes</TabsTrigger> : null}
           {isAdmin ? <TabsTrigger value="regras">Notificações</TabsTrigger> : null}
           {isAdmin ? <TabsTrigger value="disparos">Disparos</TabsTrigger> : null}
           {isAdmin ? <TabsTrigger value="auditoria">Auditoria</TabsTrigger> : null}
           {isAdmin ? <TabsTrigger value="integracoes">Integrações</TabsTrigger> : null}
+          {isAdmin ? <TabsTrigger value="personalizacao">Personalização</TabsTrigger> : null}
+          {isAdmin ? <TabsTrigger value="mensageria">Mensageria</TabsTrigger> : null}
         </TabsList>
 
         <TabsContent value="usuarios" className="pt-4">
@@ -529,6 +534,7 @@ function Admin() {
                   placeholder="Ex.: aviso imediato à coordenação em saída de equipamento"
                 />
               </div>
+              <div className="space-y-2"><Label>Canal da notificação</Label><Select value={canal} onValueChange={setCanal}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="email">E-mail</SelectItem><SelectItem value="teams">Microsoft Teams</SelectItem></SelectContent></Select></div>
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
               <label className="flex items-start gap-3 rounded-md border border-border p-3 text-sm">
@@ -557,7 +563,7 @@ function Admin() {
                     {EVENTOS.find((e) => e.valor === r.evento)?.label ?? r.evento}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    Nível {r.nivel} · {r.prazo_minutos} min · {r.destinatarios || "sem e-mail fixo"}
+                    Nível {r.nivel} · {r.prazo_minutos} min · {r.canal === "teams" ? "Microsoft Teams" : "E-mail"} · {r.destinatarios || "sem e-mail fixo"}
                   </p>
                   <p className="mt-1 text-xs text-muted-foreground">
                     {r.criticidade_minima
@@ -617,6 +623,21 @@ function Admin() {
           </div>
         </TabsContent>
 
+        <TabsContent value="personalizacao" className={isAdmin ? "pt-4" : "hidden"}>
+          {isAdmin ? <VisitSettingsPanel /> : null}
+        </TabsContent>
+        <TabsContent value="mensageria" className={isAdmin ? "space-y-5 pt-4" : "hidden"}>
+          <section className="space-y-4 py-2">
+            <h2 className="text-base font-semibold">Entrega de mensagens</h2>
+            <Badge variant="outline">Conexão de envio pendente</Badge>
+            <p className="text-sm text-muted-foreground">Os avisos ficam registrados no histórico. O envio real de e-mails e PDFs ao Teams ainda depende da conexão Microsoft 365.</p>
+            <dl className="grid gap-4 sm:grid-cols-2"><div><dt className="text-sm font-medium">Alertas operacionais</dt><dd className="text-sm text-muted-foreground">E-mail ou Microsoft Teams, conforme o canal de cada regra em Notificações.</dd></div><div><dt className="text-sm font-medium">Destinatários</dt><dd className="text-sm text-muted-foreground">Técnicos, coordenadores do turno e gestores conforme as regras cadastradas.</dd></div></dl>
+          </section>
+          <section className="space-y-4 border-t border-border py-5">
+            <h2 className="text-base font-semibold">Microsoft Teams — relatórios</h2>
+            <div className="grid gap-4 sm:grid-cols-[1fr_auto] sm:items-end"><div className="space-y-2"><Label htmlFor="mensageria-teams">Endereço da equipe / canal</Label><Input id="mensageria-teams" type="email" value={teamsRelatorio} onChange={(e) => setTeamsRelatorio(e.target.value)} /></div><Button onClick={salvarTeamsRelatorio}>Salvar destino</Button></div>
+          </section>
+        </TabsContent>
         <TabsContent value="integracoes" className={isAdmin ? "space-y-4 pt-4" : "hidden"}>
           <section className="panel space-y-4 p-5">
             <h2 className="text-base font-semibold">InvGate (Service Desk / ITSM)</h2>
@@ -638,25 +659,6 @@ function Admin() {
             <p className="text-xs text-muted-foreground">
               Atualizado {fmtDateTime(data?.integracoes?.updated_at)}.
             </p>
-          </section>
-
-          <section className="panel space-y-4 p-5">
-            <h2 className="text-base font-semibold">Microsoft Teams (relatórios)</h2>
-            <p className="text-sm text-muted-foreground">
-              O relatório mensal será registrado para envio à equipe ou ao canal informado abaixo.
-            </p>
-            <div className="grid gap-4 sm:grid-cols-[1fr_auto] sm:items-end">
-              <div className="space-y-2">
-                <Label>Endereço da equipe / canal</Label>
-                <Input
-                  type="email"
-                  value={teamsRelatorio}
-                  onChange={(e) => setTeamsRelatorio(e.target.value)}
-                  placeholder="equipe@br.teams.ms"
-                />
-              </div>
-              <Button onClick={salvarTeamsRelatorio}>Salvar</Button>
-            </div>
           </section>
 
           <section className="panel space-y-4 p-5">
