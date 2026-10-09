@@ -9,7 +9,7 @@ export type EquipamentoVisita = { descricao: string; modelo: string; serial: str
 export type FichaVisita = { campos: Record<string, string>; equipamentos: EquipamentoVisita[] };
 export const novaFicha = (): FichaVisita => ({ campos: {}, equipamentos: [] });
 
-export function VisitaFichaFields({ value, onChange }: { value: FichaVisita; onChange: (value: FichaVisita) => void }) {
+export function VisitaFichaFields({ value, onChange, tipos = ["Visita", "Auditoria", "Fornecedor", "Manutenção"] }: { value: FichaVisita; onChange: (value: FichaVisita) => void; tipos?: string[] }) {
   function campo(key: string, content: string) { onChange({ ...value, campos: { ...value.campos, [key]: content } }); }
   const campos = [
     ["unidade", "Unidade / sede", "text"], ["empresa", "Empresa / órgão", "text"],
@@ -23,7 +23,7 @@ export function VisitaFichaFields({ value, onChange }: { value: FichaVisita; onC
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {campos.map(([key = "", label = "", type = "text"]) => <div key={key} className="space-y-2"><Label htmlFor={`ficha-${key}`}>{label}</Label><Input id={`ficha-${key}`} type={type} value={value.campos[key] ?? ""} onChange={(e) => campo(key, e.target.value)} className="min-h-11" /></div>)}
       {[
-        { key: "tipo", label: "Tipo da visita", options: ["Visita", "Auditoria", "Fornecedor", "Manutenção"] },
+        { key: "tipo", label: "Tipo da visita", options: tipos },
         { key: "criticidade", label: "Criticidade", options: ["Normal", "Emergencial"] },
       ].map(({ key, label, options }) => <div key={key} className="space-y-2"><Label>{label}</Label><Select value={value.campos[key] ?? options[0] ?? ""} onValueChange={(v) => campo(key, v)}><SelectTrigger className="min-h-11"><SelectValue /></SelectTrigger><SelectContent>{options.map((v) => <SelectItem key={v} value={v}>{v}</SelectItem>)}</SelectContent></Select></div>)}
     </div>

@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import { AlertTriangle, LogIn, LogOut, Plus } from "lucide-react";
+import { AlertTriangle, FileText, LogIn, LogOut, Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { uploadEvidencia, signedUrl } from "@/lib/storage";
@@ -24,6 +24,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { MediaCapture } from "@/components/MediaCapture";
+import { VisitRecord } from "@/components/VisitRecord";
+import { useVisitSettings } from "@/components/VisitSettingsPanel";
+import { DEFAULT_VISIT_SETTINGS } from "@/lib/operational-settings";
 
 export const Route = createFileRoute("/_authenticated/terceiros")({
   head: () => ({
@@ -55,12 +58,27 @@ function Terceiros() {
   const [caches, setCaches] = useState<ChamadoItsm[]>([]);
   const [saida, setSaida] = useState<Tables<"visitas"> | null>(null);
   const [assinatura, setAssinatura] = useState<File | undefined>();
-  const [assinaturaUrl, setAssinaturaUrl] = useState<string | null>(null);
+  const [consulta, setConsulta] = useState<Tables<"visitas"> | null>(null);
+  const { data: configuredSettings } = useVisitSettings();
+  const settings = configuredSettings ?? DEFAULT_VISIT_SETTINGS;
+  const { data: evidence, isFetching: loadingEvidence, isError: evidenceError } = useQuery({
+    queryKey: ["visit-evidence", consulta?.id],
+    enabled: consulta !== null,
+    staleTime: 0,
+    queryFn: async () => {
+      const [signature, photo] = await Promise.all([
+        consulta?.assinatura_saida_path ? signedUrl(consulta.assinatura_saida_path) : Promise.resolve(null),
+        consulta?.foto_documento_url ? signedUrl(consulta.foto_documento_url) : Promise.resolve(null),
+      ]);
+      if ((consulta?.assinatura_saida_path && !signature) || (consulta?.foto_documento_url && !photo)) throw new Error("Evidência indisponível.");
+      return { signature, photo };
+    },
+  });
   const [tab, setTab] = useState("visitas");
   const [motivo, setMotivo] = useState("");
   const [fornecedorId, setFornecedorId] = useState("");
   const [atividadeId, setAtividadeId] = useState("");
-  const [zona, setZona] = useState("Sala de Servidores");
+  const [zona, setZona] = useState("");
   const [duracao, setDuracao] = useState("120");
   const [acompanhante, setAcompanhante] = useState("");
   const [consent, setConsent] = useState(false);
@@ -123,15 +141,15 @@ function Terceiros() {
           pessoa_nome: pessoa,
           modalidade,
           documento: documento || null,
-          tipo_documento: tipoDoc,
-          ficha_registro: JSON.parse(JSON.stringify(ficha)) as Json,
+          tipo_documento: settings.documentos.includes(tipoDoc) ? tipoDoc : settings.documentos[0] ?? "RG",
+          ficha_registro: JSON.parse(JSON.stringify({ ...ficha, campos: { ...ficha.campos, tipo: ficha.campos['tipo'] || settings.tipos[0], criticidade: ficha.campos['criticidade'] || "Normal" } })) as Json,
           chamados_itsm: chamados,
           chamados_itsm_cache: JSON.parse(JSON.stringify(caches)) as Json,
           motivo_visita: motivo.trim() || null,
           foto_documento_url: foto,
           fornecedor_id: fornecedorId || null,
           atividade_id: atividadeId || null,
-          zona,
+          zona: settings.zonas.includes(zona) ? zona : settings.zonas[0] ?? "Data Center Sede 1",
           duracao_prevista_min: Number(duracao || 120),
           acompanhante_id: acompanhante || null,
           consentimento_lgpd: consent,
@@ -188,14 +206,6 @@ function Terceiros() {
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Não foi possível registrar a saída.");
     } finally { setBusy(false); }
-  }
-
-  async function verAssinatura(path: string) {
-    try {
-      const url = await signedUrl(path);
-      if (!url) throw new Error("Assinatura indisponível.");
-      setAssinaturaUrl(url);
-    } catch { toast.error("Não foi possível abrir a assinatura."); }
   }
 
   async function alertarAtraso(id: string, nome: string) {
@@ -296,6 +306,7 @@ function Terceiros() {
                     </p>
                   </div>
                   <div className="flex flex-wrap items-center gap-2">
+                    <Button size="sm" variant="outline" className="min-h-11 h-auto whitespace-normal" onClick={() => setConsulta(v)}><FileText className="size-4 shrink-0" />{settings.consultar}</Button>
                     {atrasado ? (
                       <>
                         <Badge variant="destructive">Check-out em atraso</Badge>
@@ -311,11 +322,10 @@ function Terceiros() {
                     {v.checkout_em ? (
                       <>
                         <Badge variant="secondary">Encerrada</Badge>
-                        {v.assinatura_saida_path ? <Button size="sm" variant="outline" className="min-h-11" onClick={() => void verAssinatura(v.assinatura_saida_path ?? "")}>Ver assinatura</Button> : null}
                       </>
                     ) : (
-                      <Button size="sm" className="min-h-11" onClick={() => { setAssinatura(undefined); setSaida(v); }}>
-                        <LogOut className="size-4" /> Assinar saída
+                      <Button size="sm" className="min-h-11 h-auto whitespace-normal" onClick={() => { setAssinatura(undefined); setSaida(v); }}>
+                        <LogOut className="size-4 shrink-0" /> {settings.checkout}
                       </Button>
                     )}
                   </div>
@@ -347,12 +357,12 @@ function Terceiros() {
               </div>
               <div className="space-y-2">
                 <Label>Tipo de documento</Label>
-                <Select value={tipoDoc} onValueChange={setTipoDoc}>
+                <Select value={settings.documentos.includes(tipoDoc) ? tipoDoc : settings.documentos[0] ?? ""} onValueChange={setTipoDoc}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {["RG", "CNH", "CPF", "Passaporte", "Crachá corporativo"].map((t) => (
+                    {settings.documentos.map((t) => (
                       <SelectItem key={t} value={t}>
                         {t}
                       </SelectItem>
@@ -404,7 +414,7 @@ function Terceiros() {
               </div>
               <div className="space-y-2">
                 <Label>Zona de acesso</Label>
-                <Input value={zona} onChange={(e) => setZona(e.target.value)} />
+                <Select value={settings.zonas.includes(zona) ? zona : settings.zonas[0] ?? ""} onValueChange={setZona}><SelectTrigger className="min-h-11"><SelectValue /></SelectTrigger><SelectContent>{settings.zonas.map((z) => <SelectItem key={z} value={z}>{z}</SelectItem>)}</SelectContent></Select>
               </div>
               <div className="space-y-2">
                 <Label>Duração prevista (min)</Label>
@@ -432,7 +442,7 @@ function Terceiros() {
             </div>
 
             <ChamadosItsmMulti numeros={chamados} onNumeros={setChamados} caches={caches} onCaches={setCaches} label="Chamado / mudança ITSM" />
-            <VisitaFichaFields value={ficha} onChange={setFicha} />
+            <VisitaFichaFields value={ficha} onChange={setFicha} tipos={settings.tipos} />
 
             <label className="flex items-start gap-3 rounded-md border border-border p-3 text-sm">
               <Checkbox checked={consent} onCheckedChange={(v) => setConsent(v === true)} />
@@ -442,8 +452,8 @@ function Terceiros() {
               </span>
             </label>
 
-            <Button className="min-h-12 w-full sm:w-auto" onClick={checkin} disabled={busy}>
-              <LogIn className="size-4" /> {busy ? "Registrando…" : "Registrar check-in"}
+            <Button className="min-h-12 h-auto whitespace-normal w-full sm:w-auto" onClick={checkin} disabled={busy}>
+              <LogIn className="size-4 shrink-0" /> {busy ? "Registrando…" : settings.checkin}
             </Button>
           </section>
         </TabsContent>
@@ -551,10 +561,10 @@ function Terceiros() {
           </div>
         </DialogContent>
       </Dialog>
-      <Dialog open={assinaturaUrl !== null} onOpenChange={(open) => { if (!open) setAssinaturaUrl(null); }}>
-        <DialogContent className="w-[calc(100%-2rem)] max-w-2xl">
-          <DialogHeader><DialogTitle>Assinatura registrada</DialogTitle><DialogDescription>Assinatura de saída vinculada ao registro da visita.</DialogDescription></DialogHeader>
-          {assinaturaUrl ? <img src={assinaturaUrl} alt="Assinatura de saída do visitante" className="w-full rounded-md border border-border" /> : null}
+      <Dialog open={consulta !== null} onOpenChange={(open) => { if (!open) setConsulta(null); }}>
+        <DialogContent className="max-h-[90dvh] w-[calc(100%-2rem)] max-w-3xl overflow-y-auto">
+          <DialogHeader><DialogTitle>Ficha completa da visita</DialogTitle><DialogDescription>{consulta?.pessoa_nome} · {fmtDateTime(consulta?.checkin_em)}</DialogDescription></DialogHeader>
+          {consulta ? <VisitRecord visit={consulta} signatureUrl={evidence?.signature ?? null} photoUrl={evidence?.photo ?? null} loading={loadingEvidence} failed={evidenceError} acompanhante={nomePerfil(consulta.acompanhante_id)} fornecedor={nomeForn(consulta.fornecedor_id)} atividade={osLabel(consulta.atividade_id)} registradoPor={nomePerfil(consulta.registrado_por)} checkoutPor={nomePerfil(consulta.checkout_registrado_por)} /> : null}
         </DialogContent>
       </Dialog>
     </div>

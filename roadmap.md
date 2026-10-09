@@ -1,5 +1,9 @@
 # Roadmap
 
+- [x] Consultar ficha completa com assinatura ao final.
+- [x] Zonas Sede 1/Sede 3 e personalização das opções e botões de visitas.
+- [x] Área de mensageria com canal por regra e destino Teams, explicitando conexão pendente.
+
 - [x] Adaptar ficha de visitas enviada para check-in sem informações veiculares.
 - [x] Capturar e guardar assinatura de check-out no tablet/iPad.
 - [x] Vincular múltiplos chamados ITSM às visitas e conferir preparação Microsoft 365.
