@@ -5,7 +5,14 @@ import { toast } from "sonner";
 import { AlertTriangle, LogIn, LogOut, Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { uploadEvidencia } from "@/lib/storage";
+import { uploadEvidencia, signedUrl } from "@/lib/storage";
+import type { Json, Tables } from "@/integrations/supabase/types";
+import type { ChamadoItsm } from "@/lib/invgate.functions";
+import { ChamadosItsmMulti, ChamadosItsmLista } from "@/components/ChamadoItsmField";
+import { SignatureCapture } from "@/components/SignatureCapture";
+import { VisitaFichaFields, novaFicha, type FichaVisita } from "@/components/VisitaFichaFields";
+import { validarEntrada, validarSaida } from "@/lib/visitas";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { dispararNotificacao, registrarAuditoria } from "@/lib/notificacoes";
 import { fmtDate, fmtDateTime, minutosEntre } from "@/lib/snoc";
 import { Button } from "@/components/ui/button";
@@ -43,7 +50,13 @@ function Terceiros() {
   const [modalidade, setModalidade] = useState<"individual" | "grupo">("individual");
   const [documento, setDocumento] = useState("");
   const [tipoDoc, setTipoDoc] = useState("RG");
-  const [placa, setPlaca] = useState("");
+  const [ficha, setFicha] = useState<FichaVisita>(novaFicha);
+  const [chamados, setChamados] = useState<string[]>([]);
+  const [caches, setCaches] = useState<ChamadoItsm[]>([]);
+  const [saida, setSaida] = useState<Tables<"visitas"> | null>(null);
+  const [assinatura, setAssinatura] = useState<File | undefined>();
+  const [assinaturaUrl, setAssinaturaUrl] = useState<string | null>(null);
+  const [tab, setTab] = useState("visitas");
   const [motivo, setMotivo] = useState("");
   const [fornecedorId, setFornecedorId] = useState("");
   const [atividadeId, setAtividadeId] = useState("");
@@ -91,12 +104,13 @@ function Terceiros() {
 
   async function checkin() {
     if (!user) return;
-    if (!pessoa.trim()) {
-      toast.error("Informe o nome da pessoa.");
+    const invalid = validarEntrada(pessoa, documento, acompanhante, consent);
+    if (invalid) {
+      toast.error(invalid);
       return;
     }
-    if (!consent) {
-      toast.error("O consentimento de tratamento de dados (LGPD) é obrigatório.");
+    if (!Number.isFinite(Number(duracao)) || Number(duracao) <= 0) {
+      toast.error("Informe uma duração prevista maior que zero.");
       return;
     }
     setBusy(true);
@@ -110,7 +124,9 @@ function Terceiros() {
           modalidade,
           documento: documento || null,
           tipo_documento: tipoDoc,
-          placa_veiculo: placa.trim() || null,
+          ficha_registro: JSON.parse(JSON.stringify(ficha)) as Json,
+          chamados_itsm: chamados,
+          chamados_itsm_cache: JSON.parse(JSON.stringify(caches)) as Json,
           motivo_visita: motivo.trim() || null,
           foto_documento_url: foto,
           fornecedor_id: fornecedorId || null,
@@ -131,10 +147,13 @@ function Terceiros() {
       toast.success("Check-in registrado");
       setPessoa("");
       setDocumento("");
-      setPlaca("");
+      setFicha(novaFicha());
+      setChamados([]);
+      setCaches([]);
       setMotivo("");
       setFotoDoc(undefined);
       setConsent(false);
+      setTab("visitas");
       qc.invalidateQueries({ queryKey: ["terceiros"] });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Falha no check-in");
@@ -143,26 +162,40 @@ function Terceiros() {
     }
   }
 
-  async function checkout(id: string, atividade_id: string | null) {
-    const { error } = await supabase
-      .from("visitas")
-      .update({ checkout_em: new Date().toISOString() })
-      .eq("id", id);
-    if (error) {
-      toast.error(error.message);
-      return;
-    }
-    await registrarAuditoria("checkout", "visitas", id);
-    if (atividade_id) {
-      await supabase
-        .from("atividades")
-        .update({ status: "aguardando_fechamento" })
-        .eq("id", atividade_id);
-      toast.info("Check-out feito. A OS vinculada aguarda confirmação de encerramento.");
-    } else {
-      toast.success("Check-out registrado");
-    }
-    qc.invalidateQueries({ queryKey: ["terceiros"] });
+  async function checkout() {
+    if (!user || !saida || busy) return;
+    const invalid = validarSaida(assinatura);
+    if (invalid || !assinatura) { toast.error(invalid ?? "Assinatura obrigatória."); return; }
+    setBusy(true);
+    try {
+      const path = await uploadEvidencia(assinatura, `visitas/${saida.id}/assinaturas`);
+      const { data: updated, error } = await supabase.from("visitas")
+        .update({ checkout_em: new Date().toISOString(), assinatura_saida_path: path, checkout_registrado_por: user.id })
+        .eq("id", saida.id).is("checkout_em", null).select("id").maybeSingle();
+      if (error || !updated) {
+        await supabase.storage.from("evidencias").remove([path]);
+        throw error ?? new Error("Esta visita já foi encerrada. Atualize a lista.");
+      }
+      await registrarAuditoria("checkout", "visitas", saida.id, { assinatura_saida_path: path });
+      if (saida.atividade_id) {
+        const { error: osError } = await supabase.from("atividades").update({ status: "aguardando_fechamento" }).eq("id", saida.atividade_id);
+        if (osError) toast.warning("Saída assinada. Não foi possível atualizar a OS vinculada.");
+      }
+      toast.success("Check-out registrado com assinatura do visitante.");
+      setSaida(null);
+      setAssinatura(undefined);
+      void qc.invalidateQueries({ queryKey: ["terceiros"] });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Não foi possível registrar a saída.");
+    } finally { setBusy(false); }
+  }
+
+  async function verAssinatura(path: string) {
+    try {
+      const url = await signedUrl(path);
+      if (!url) throw new Error("Assinatura indisponível.");
+      setAssinaturaUrl(url);
+    } catch { toast.error("Não foi possível abrir a assinatura."); }
   }
 
   async function alertarAtraso(id: string, nome: string) {
@@ -226,12 +259,12 @@ function Terceiros() {
         <p className="label-mono">Módulo 3.3</p>
         <h1 className="mt-1 text-2xl font-bold">Controle de acesso de terceiros</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Todo acesso fica amarrado a uma atividade, com acompanhante interno e log permanente.
+          Registro de visitas e saídas assinadas.
         </p>
       </header>
 
-      <Tabs defaultValue="visitas">
-        <TabsList>
+      <Tabs value={tab} onValueChange={setTab}>
+        <TabsList className="h-auto flex-wrap gap-1">
           <TabsTrigger value="visitas">Visitas ({emCampo.length} em campo)</TabsTrigger>
           <TabsTrigger value="checkin">Novo check-in</TabsTrigger>
           <TabsTrigger value="fornecedores">Fornecedores</TabsTrigger>
@@ -251,12 +284,12 @@ function Terceiros() {
                     <p className="text-xs text-muted-foreground">
                       {nomeForn(v.fornecedor_id)} · {v.zona} · {v.tipo_documento || "doc."}{" "}
                       {v.documento || "—"}
-                      {v.placa_veiculo ? ` · veículo ${v.placa_veiculo}` : ""}
                       {v.motivo_visita ? ` · ${v.motivo_visita}` : ""}
                     </p>
                     <p className="mt-1 text-xs text-muted-foreground">
                       {osLabel(v.atividade_id)} · acompanhante {nomePerfil(v.acompanhante_id)}
                     </p>
+                    <div className="mt-2"><ChamadosItsmLista numeros={v.chamados_itsm} cache={v.chamados_itsm_cache} /></div>
                     <p className="mt-1 text-xs text-muted-foreground">
                       Entrada {fmtDateTime(v.checkin_em)} · Saída {fmtDateTime(v.checkout_em)} ·{" "}
                       {minutosEntre(v.checkin_em, v.checkout_em)} min (previsto {v.duracao_prevista_min})
@@ -276,10 +309,13 @@ function Terceiros() {
                       </>
                     ) : null}
                     {v.checkout_em ? (
-                      <Badge variant="secondary">Encerrada</Badge>
+                      <>
+                        <Badge variant="secondary">Encerrada</Badge>
+                        {v.assinatura_saida_path ? <Button size="sm" variant="outline" className="min-h-11" onClick={() => void verAssinatura(v.assinatura_saida_path ?? "")}>Ver assinatura</Button> : null}
+                      </>
                     ) : (
-                      <Button size="sm" onClick={() => checkout(v.id, v.atividade_id)}>
-                        <LogOut className="size-4" /> Check-out
+                      <Button size="sm" className="min-h-11" onClick={() => { setAssinatura(undefined); setSaida(v); }}>
+                        <LogOut className="size-4" /> Assinar saída
                       </Button>
                     )}
                   </div>
@@ -327,14 +363,6 @@ function Terceiros() {
               <div className="space-y-2">
                 <Label>Número do documento</Label>
                 <Input value={documento} onChange={(e) => setDocumento(e.target.value)} />
-              </div>
-              <div className="space-y-2">
-                <Label>Placa do veículo</Label>
-                <Input
-                  value={placa}
-                  onChange={(e) => setPlaca(e.target.value.toUpperCase())}
-                  placeholder="ABC1D23"
-                />
               </div>
               <div className="space-y-2">
                 <Label>Motivo da visita</Label>
@@ -403,6 +431,9 @@ function Terceiros() {
               </div>
             </div>
 
+            <ChamadosItsmMulti numeros={chamados} onNumeros={setChamados} caches={caches} onCaches={setCaches} label="Chamado / mudança ITSM" />
+            <VisitaFichaFields value={ficha} onChange={setFicha} />
+
             <label className="flex items-start gap-3 rounded-md border border-border p-3 text-sm">
               <Checkbox checked={consent} onCheckedChange={(v) => setConsent(v === true)} />
               <span className="text-muted-foreground">
@@ -411,7 +442,7 @@ function Terceiros() {
               </span>
             </label>
 
-            <Button onClick={checkin} disabled={busy}>
+            <Button className="min-h-12 w-full sm:w-auto" onClick={checkin} disabled={busy}>
               <LogIn className="size-4" /> {busy ? "Registrando…" : "Registrar check-in"}
             </Button>
           </section>
@@ -506,6 +537,26 @@ function Terceiros() {
           </div>
         </TabsContent>
       </Tabs>
+      <Dialog open={saida !== null} onOpenChange={(open) => { if (!open && !busy) { setSaida(null); setAssinatura(undefined); } }}>
+        <DialogContent className="max-h-[90dvh] w-[calc(100%-2rem)] max-w-2xl overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Assinatura de saída</DialogTitle>
+            <DialogDescription>{saida?.pessoa_nome}{saida?.modalidade === "grupo" ? " · líder do grupo" : ""} · {saida?.documento}</DialogDescription>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">Declaro encerrada minha visita e confirmo a devolução dos crachás, chaves ou cartões recebidos.</p>
+          <SignatureCapture onFile={setAssinatura} />
+          <div className="flex flex-wrap justify-end gap-3">
+            <Button variant="outline" className="min-h-12" disabled={busy} onClick={() => setSaida(null)}>Cancelar</Button>
+            <Button className="min-h-12" disabled={busy || !assinatura} onClick={() => void checkout()}><LogOut className="size-4" /> {busy ? "Registrando…" : "Confirmar check-out"}</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={assinaturaUrl !== null} onOpenChange={(open) => { if (!open) setAssinaturaUrl(null); }}>
+        <DialogContent className="w-[calc(100%-2rem)] max-w-2xl">
+          <DialogHeader><DialogTitle>Assinatura registrada</DialogTitle><DialogDescription>Assinatura de saída vinculada ao registro da visita.</DialogDescription></DialogHeader>
+          {assinaturaUrl ? <img src={assinaturaUrl} alt="Assinatura de saída do visitante" className="w-full rounded-md border border-border" /> : null}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
