@@ -1,0 +1,20 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1791567328103,
+      "tag": "0000_visitas_ficha_assinatura_tablet",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1791567433706,
+      "tag": "0001_validar_assinatura_checkout_visitas",
+      "breakpoints": true
+    }
+  ]
+}

@@ -13,3 +13,5 @@
 - Treat Microsoft 365 as the primary workforce identity; keep local password access only as a super-admin contingency path.
 - Require an active profile and assigned role before protected routes; first-time institutional users remain pending.
 - Bind browser sessions to one six-hour operational shift and sign out when the shift changes.
+- Store extended visitor form data in the visit's JSON record and signatures as private evidence paths; this keeps the original access history compatible while linking signed checkout to its visit.
+- Use a reusable signature-pad capture with touch-safe canvas sizing for handwritten operational signatures; this preserves strokes on tablet orientation changes.

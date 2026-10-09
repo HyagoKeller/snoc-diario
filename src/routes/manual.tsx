@@ -174,7 +174,7 @@ const SECOES: Secao[] = [
       {
         titulo: "Check-in",
         texto:
-          "Escolha visita individual ou em grupo. No grupo, informe apenas o líder da excursão, seu documento com foto, a zona, a OS, o acompanhante interno e a duração prevista. Registre o consentimento LGPD.",
+          "Escolha visita individual ou em grupo e preencha a ficha: identificação, empresa/órgão, autorização, horários previstos e equipamentos portados. No grupo, cadastre apenas o líder. Vincule a OS e os chamados ITSM aplicáveis, selecione o acompanhante e registre o consentimento LGPD. Não são solicitados dados veiculares.",
       },
       {
         titulo: "Acompanhamento",
@@ -184,7 +184,7 @@ const SECOES: Secao[] = [
       {
         titulo: "Check-out",
         texto:
-          "Ao término, use Check-out na visita. O horário de saída é gravado, a auditoria registra o evento e a OS vinculada vai para “aguardando fechamento”.",
+          "Ao término, toque em Assinar saída. O visitante ou líder assina diretamente na tela do tablet/iPad; não precisa preencher a ficha novamente. Confirme o check-out para gravar assinatura e horário na visita. A OS vinculada passa a aguardar fechamento. A assinatura fica disponível em Ver assinatura.",
       },
     ],
     regras: [

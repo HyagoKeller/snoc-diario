@@ -1,5 +1,10 @@
 # Roadmap
 
+- [x] Adaptar ficha de visitas enviada para check-in sem informações veiculares.
+- [x] Capturar e guardar assinatura de check-out no tablet/iPad.
+- [x] Vincular múltiplos chamados ITSM às visitas e conferir preparação Microsoft 365.
+- [x] Verificar formulário e assinatura isolados em telas de tablet; teste autenticado completo depende de sessão do usuário.
+
 - [x] Captura direta de foto e vídeo em celular para rondas, visitas e evidências de OS.
 - [x] Quatro turnos de seis horas, incluindo Madrugada, com passagem cíclica ao próximo turno.
 - [x] Modalidade de visita em grupo com cadastro apenas do líder.
