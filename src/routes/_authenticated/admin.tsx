@@ -17,6 +17,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { VisitSettingsPanel } from "@/components/VisitSettingsPanel";
+import { ChamadoItsmField } from "@/components/ChamadoItsmField";
+import type { ChamadoItsm } from "@/lib/invgate.functions";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
@@ -66,6 +68,8 @@ function Admin() {
   const [grupos, setGrupos] = useState<Record<string, string>>({});
   const [coords, setCoords] = useState<Record<string, string>>({});
   const [baseUrl, setBaseUrl] = useState("");
+  const [chamadoTeste, setChamadoTeste] = useState("");
+  const [chamadoTesteCache, setChamadoTesteCache] = useState<ChamadoItsm | null>(null);
   const [spSite, setSpSite] = useState("");
   const [spBiblioteca, setSpBiblioteca] = useState("");
   const [spPasta, setSpPasta] = useState("SNOC");
@@ -239,14 +243,18 @@ function Admin() {
 
   async function salvarIntegracao() {
     const valor = baseUrl.trim().replace(/\/+$/, "");
-    if (!valor) {
-      toast.error("Informe a URL base do InvGate.");
+    let url: URL;
+    try { url = new URL(valor); } catch {
+      toast.error("Informe uma URL HTTPS válida do InvGate.");
+      return;
+    }
+    if (url.protocol !== "https:" || url.username || url.password || url.search || url.hash) {
+      toast.error("Informe uma URL HTTPS sem credenciais, parâmetros ou fragmentos.");
       return;
     }
     const { error } = await supabase
       .from("integracoes_config")
-      .update({ valor })
-      .eq("chave", "invgate_base_url");
+      .upsert({ chave: "invgate_base_url", valor }, { onConflict: "chave" });
     if (error) {
       toast.error(error.message);
       return;
@@ -642,13 +650,16 @@ function Admin() {
           <section className="panel space-y-4 p-5">
             <h2 className="text-base font-semibold">InvGate (Service Desk / ITSM)</h2>
             <p className="text-sm text-muted-foreground">
-              A URL base é usada para consultar e abrir chamados vinculados a rondas e ordens de
-              serviço. O token de API fica guardado como segredo do servidor e nunca aparece aqui.
+               Autenticação básica com o nome de usuário e a chave da credencial de API.
+               A consulta é somente leitura; os chamados podem ser vinculados às visitas, rondas,
+               atividades e passagens de turno.
             </p>
             <div className="grid gap-4 sm:grid-cols-[1fr_auto] sm:items-end">
               <div className="space-y-2">
-                <Label>URL base do InvGate</Label>
+                 <Label htmlFor="invgate-url">URL base do InvGate</Label>
                 <Input
+                   id="invgate-url"
+                   type="url"
                   value={baseUrl}
                   onChange={(e) => setBaseUrl(e.target.value)}
                   placeholder="https://agu.sd.cloud.invgate.net"
@@ -659,6 +670,22 @@ function Admin() {
             <p className="text-xs text-muted-foreground">
               Atualizado {fmtDateTime(data?.integracoes?.updated_at)}.
             </p>
+             <div className="space-y-3 border-t border-border pt-4">
+               <Badge variant="outline">Básico — usuário e chave</Badge>
+               <p className="text-sm text-muted-foreground">
+                 No InvGate, mantenha a permissão API ativada. Guarde o nome de usuário em
+                 {" "}<code>INVGATE_API_USERNAME</code> e a chave em <code>INVGATE_API_KEY</code>,
+                 nos segredos do projeto. O alias identifica a credencial no InvGate e não é o usuário.
+                 Não informe a chave neste formulário.
+               </p>
+               <ChamadoItsmField
+                 numero={chamadoTeste}
+                 onNumero={setChamadoTeste}
+                 cache={chamadoTesteCache}
+                 onCache={setChamadoTesteCache}
+                 label="Consultar chamado para testar a conexão"
+               />
+             </div>
           </section>
 
           <section className="panel space-y-4 p-5">

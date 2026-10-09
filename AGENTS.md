@@ -17,3 +17,4 @@
 - Use a reusable signature-pad capture with touch-safe canvas sizing for handwritten operational signatures; this preserves strokes on tablet orientation changes.
 - Store visit presentation settings as a validated JSON entry in integracoes_config and share its query across administration and check-in; this keeps options consistent without changing historical records.
 - Render visit consultation through a read-only record component and resolve evidence paths with short-lived signed URLs; this keeps completed forms intact and evidence private.
+- Keep InvGate credential construction in a server-only helper and use the shared ticket lookup for configuration tests; this keeps secrets out of browser code and exercises the operational request path.
