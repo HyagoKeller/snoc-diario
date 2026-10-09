@@ -25,7 +25,7 @@ export function VisitaFichaFields({ value, onChange }: { value: FichaVisita; onC
       {[
         { key: "tipo", label: "Tipo da visita", options: ["Visita", "Auditoria", "Fornecedor", "Manutenção"] },
         { key: "criticidade", label: "Criticidade", options: ["Normal", "Emergencial"] },
-      ].map(({ key, label, options }) => <div key={key} className="space-y-2"><Label>{label}</Label><Select value={value.campos[key] ?? options[0]} onValueChange={(v) => campo(key, v)}><SelectTrigger className="min-h-11"><SelectValue /></SelectTrigger><SelectContent>{options.map((v) => <SelectItem key={v} value={v}>{v}</SelectItem>)}</SelectContent></Select></div>)}
+      ].map(({ key, label, options }) => <div key={key} className="space-y-2"><Label>{label}</Label><Select value={value.campos[key] ?? options[0] ?? ""} onValueChange={(v) => campo(key, v)}><SelectTrigger className="min-h-11"><SelectValue /></SelectTrigger><SelectContent>{options.map((v) => <SelectItem key={v} value={v}>{v}</SelectItem>)}</SelectContent></Select></div>)}
     </div>
     <div className="grid gap-4 sm:grid-cols-2">
       {["Identidade conferida e autorização validada", "Regras de acesso e restrições informadas", "Acompanhamento contínuo previsto", "Registro de imagens autorizado"].map((label, i) => <div key={label} className="space-y-2"><Label>{label}</Label><Select value={value.campos[`verificacao_${i}`] ?? ""} onValueChange={(v) => campo(`verificacao_${i}`, v)}><SelectTrigger className="min-h-11"><SelectValue placeholder="Selecionar" /></SelectTrigger><SelectContent>{["Sim", "Não", "Não se aplica"].map((v) => <SelectItem key={v} value={v}>{v}</SelectItem>)}</SelectContent></Select></div>)}
@@ -35,6 +35,6 @@ export function VisitaFichaFields({ value, onChange }: { value: FichaVisita; onC
       {([ ["descricao", "Descrição"], ["modelo", "Marca / modelo"], ["serial", "Serial / patrimônio"], ["quantidade", "Quantidade"] ] as const).map(([key, label]) => <div key={key} className="space-y-2"><Label htmlFor={`item-${index}-${key}`}>{label}</Label><Input id={`item-${index}-${key}`} type={key === "quantidade" ? "number" : "text"} min={1} value={item[key]} onChange={(e) => onChange({ ...value, equipamentos: value.equipamentos.map((current, i) => i === index ? { ...current, [key]: e.target.value } : current) })} className="min-h-11" /></div>)}
       <Button type="button" variant="ghost" className="self-end min-h-11" aria-label={`Remover item ${index + 1}`} onClick={() => onChange({ ...value, equipamentos: value.equipamentos.filter((_, i) => i !== index) })}><Trash2 className="size-4" /></Button>
     </div>)}
-    <div className="space-y-2"><Label htmlFor="ficha-observacoes">Ocorrências e observações</Label><Textarea id="ficha-observacoes" value={value.campos.observacoes ?? ""} onChange={(e) => campo("observacoes", e.target.value)} /></div>
+    <div className="space-y-2"><Label htmlFor="ficha-observacoes">Ocorrências e observações</Label><Textarea id="ficha-observacoes" value={value.campos["observacoes"] ?? ""} onChange={(e) => campo("observacoes", e.target.value)} /></div>
   </div>;
 }

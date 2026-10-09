@@ -82,7 +82,7 @@ const PERGUNTAS = [
   },
   {
     q: "Como funciona o check-out de terceiros?",
-    a: "Toda visita em campo precisa de check-out, que grava o horário de saída, registra na trilha de auditoria e move a OS vinculada para aguardando fechamento. Passando da duração prevista, a visita é marcada como check-out em atraso e permite notificar os responsáveis.",
+    a: "A ficha é preenchida uma única vez, no check-in, sem informações veiculares e com os chamados ITSM vinculados. Na saída, o visitante ou líder do grupo apenas assina na tela do tablet/iPad. A confirmação grava assinatura, horário e auditoria; a OS vinculada aguarda fechamento. Atrasos continuam permitindo notificar os responsáveis.",
   },
   {
     q: "Como os dados pessoais de terceiros são tratados?",
