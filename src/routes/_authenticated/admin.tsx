@@ -277,8 +277,8 @@ function Admin() {
   }
 
   async function criarRegra() {
-    if (!destinatarios.trim() && !notifCoord && !notifGest) {
-      toast.error("Informe um destinatário ou selecione coordenadores / gestores.");
+    if (!destinatarios.trim()) {
+      toast.error("Informe ao menos um e-mail de destinatário.");
       return;
     }
     const { error } = await supabase.from("regras_escalonamento").insert({
