@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { invgateAuthorization, invgateBaseUrl } from "./invgate-auth.server";
 
 export type ChamadoItsm = {
   numero: string;
@@ -38,31 +39,33 @@ export const buscarChamadoItsm = createServerFn({ method: "POST" })
     const numero = data.numero.replace(/[^0-9A-Za-z-]/g, "");
     if (!numero) return { ok: false, erro: "Número de chamado inválido." };
 
-    const token = process.env["INVGATE_API_TOKEN"];
-    if (!token) {
+    const auth = invgateAuthorization(
+      process.env["INVGATE_API_USERNAME"],
+      process.env["INVGATE_API_KEY"],
+      process.env["INVGATE_API_TOKEN"],
+    );
+    if (!auth) {
       return {
         ok: false,
         erro:
-          "Integração não configurada: falta o token de API do InvGate. Um Super Admin precisa cadastrá-lo.",
+          "Conexão pendente: cadastre o nome de usuário e a chave da credencial de API do InvGate nos segredos do projeto (INVGATE_API_USERNAME e INVGATE_API_KEY).",
       };
     }
 
-    const { data: cfg } = await context.supabase
+    const { data: cfg, error: cfgError } = await context.supabase
       .from("integracoes_config")
       .select("valor")
       .eq("chave", "invgate_base_url")
       .maybeSingle();
-    const base = (cfg?.valor ?? "").replace(/\/+$/, "");
-    if (!base) return { ok: false, erro: "URL base do InvGate não configurada em Administração → Integrações." };
-
-    const auth = token.includes(":")
-      ? `Basic ${Buffer.from(token).toString("base64")}`
-      : `Bearer ${token}`;
+    if (cfgError) return { ok: false, erro: "Não foi possível ler a configuração do InvGate." };
+    const base = invgateBaseUrl(cfg?.valor ?? "");
+    if (!base) return { ok: false, erro: "Configure uma URL HTTPS válida do InvGate em Administração → Integrações." };
 
     let resposta: Response;
     try {
       resposta = await fetch(`${base}/api/v1/incident?id=${encodeURIComponent(numero)}`, {
         headers: { Authorization: auth, Accept: "application/json" },
+        redirect: "error",
       });
     } catch (e) {
       console.error("InvGate indisponível", e);
@@ -70,11 +73,12 @@ export const buscarChamadoItsm = createServerFn({ method: "POST" })
     }
 
     if (!resposta.ok) {
-      const corpo = await resposta.text();
-      console.error(`InvGate ${resposta.status}: ${corpo.slice(0, 500)}`);
+      console.error(`Falha na consulta InvGate: HTTP ${resposta.status}`);
       if (resposta.status === 404) return { ok: false, erro: `Chamado ${numero} não encontrado no InvGate.` };
-      if (resposta.status === 401 || resposta.status === 403)
-        return { ok: false, erro: "Token do InvGate sem permissão para consultar chamados." };
+      if (resposta.status === 401)
+        return { ok: false, erro: "InvGate respondeu 401: verifique o nome de usuário e a chave da credencial de API." };
+      if (resposta.status === 403)
+        return { ok: false, erro: "InvGate respondeu 403: verifique se a permissão API está ativada para a credencial e se ela pode consultar este chamado." };
       return { ok: false, erro: `InvGate respondeu ${resposta.status}. Tente novamente mais tarde.` };
     }
 
@@ -85,20 +89,27 @@ export const buscarChamadoItsm = createServerFn({ method: "POST" })
       return { ok: false, erro: "Resposta do InvGate em formato inesperado." };
     }
 
-    const raiz = (bruto as Record<string, unknown>) ?? {};
-    const alvo = (raiz["incident"] ?? raiz["data"] ?? raiz) as Record<string, unknown>;
-    const registro = Array.isArray(alvo) ? ((alvo[0] ?? {}) as Record<string, unknown>) : alvo;
+    if (!bruto || typeof bruto !== "object")
+      return { ok: false, erro: "Resposta do InvGate em formato inesperado." };
+    const raiz = bruto as Record<string, unknown>;
+    if (raiz["error"] || raiz["errors"] || raiz["success"] === false)
+      return { ok: false, erro: "O InvGate recusou a consulta. Verifique a credencial e o número do chamado." };
+    const alvo = raiz["incident"] ?? raiz["data"] ?? raiz;
+    const registro = Array.isArray(alvo) ? alvo[0] : alvo;
+    if (!registro || typeof registro !== "object" || !Object.keys(registro).length)
+      return { ok: false, erro: `Chamado ${numero} não encontrado no InvGate.` };
+    const campos = registro as Record<string, unknown>;
 
     return {
       ok: true,
       chamado: {
         numero,
-        titulo: primeiro(registro, ["title", "subject", "summary", "name"]),
-        status: primeiro(registro, ["status", "state", "incident.status"]),
-        prioridade: primeiro(registro, ["priority", "urgency", "impact"]),
-        categoria: primeiro(registro, ["category", "categoryName", "service"]),
-        solicitante: primeiro(registro, ["requester", "created_by", "customer", "author"]),
-        criado_em: primeiro(registro, ["created_at", "creation_date", "createdDate", "date"]),
+        titulo: primeiro(campos, ["title", "subject", "summary", "name"]),
+        status: primeiro(campos, ["status", "state", "incident.status"]),
+        prioridade: primeiro(campos, ["priority", "urgency", "impact"]),
+        categoria: primeiro(campos, ["category", "categoryName", "service"]),
+        solicitante: primeiro(campos, ["requester", "created_by", "customer", "author"]),
+        criado_em: primeiro(campos, ["created_at", "creation_date", "createdDate", "date"]),
         url: `${base}/incident/${encodeURIComponent(numero)}`,
         consultado_em: new Date().toISOString(),
       },
