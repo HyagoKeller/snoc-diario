@@ -19,8 +19,8 @@ export function VisitRecord({ visit, signatureUrl, photoUrl, loading, failed, ac
   acompanhante: string; fornecedor: string; atividade: string; registradoPor: string; checkoutPor: string;
 }) {
   const ficha = object(visit.ficha_registro);
-  const campos = object(ficha.campos);
-  const equipment = Array.isArray(ficha.equipamentos) ? ficha.equipamentos : [];
+  const campos = object(ficha['campos']);
+  const equipment = Array.isArray(ficha['equipamentos']) ? ficha['equipamentos'] : [];
   const details = [
     [visit.modalidade === "grupo" ? "Líder da excursão" : "Visitante", visit.pessoa_nome],
     ["Modalidade", visit.modalidade === "grupo" ? "Em grupo" : "Individual"],

@@ -70,6 +70,7 @@ function Terceiros() {
         consulta?.assinatura_saida_path ? signedUrl(consulta.assinatura_saida_path) : Promise.resolve(null),
         consulta?.foto_documento_url ? signedUrl(consulta.foto_documento_url) : Promise.resolve(null),
       ]);
+      if ((consulta?.assinatura_saida_path && !signature) || (consulta?.foto_documento_url && !photo)) throw new Error("Evidência indisponível.");
       return { signature, photo };
     },
   });
